@@ -1,0 +1,47 @@
+body {
+    background-color: #fef8ea;
+    font-family: 'EB Garamond';
+    font-size: 1.1em;
+}
+#recipe-body {
+    margin: 0 auto;
+    width: min(60%, 800px);
+    /* border: 2px solid lightcoral; */
+    padding: 30px;
+}
+#recipe-title {
+    display: block;
+    margin: 0 auto 2rem;
+    max-width: 80%;
+    height: 5rem;
+    font-size: 2rem;
+    background-color: inherit;
+    border: 2px solid #e3dac9;
+    border-radius: 10px;
+}
+#recipe-description {
+    min-height: 50px;
+    margin-bottom: 2rem;
+}
+#recipe-process {
+    min-height: 100px;
+}
+.user-input {
+    margin: 10px auto;
+    padding: 5px 20px;
+    border: 2px solid #e3dac9;
+    border-radius: 10px;
+}
+.recipe-paragraph {
+    /* border: 1px solid #e3dac9; */
+}
+input, button {
+    font-family: inherit;
+    text-align: center;
+}
+#add-ingredient-panel {
+    border: 1px solid black;
+}
+#create-ingredient-panel {
+    border: 1px solid black;
+}
