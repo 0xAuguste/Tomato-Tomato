@@ -28,31 +28,22 @@
 		<label for="recipe-process">Recipe Process</label>
 		<div name="recipe-process" id="recipe-process" class="user-input" onclick="textBoxClick(event, this)">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
-			<div id="add-ingredient-panel" style="display: none" contenteditable="false">
-				<form id="add-ingredient-form">
-					<div style="display: inline-block">
-						<label for="add-ingred-quantity" style="display:block">Quantity</label>
-						<input type="text" name="add-ingred-quantity" id="add-ingred-quantity">
-					</div>
-					<div style="display: inline-block">
-						<label for="add-ingred-unit" style="display:block">Unit</label>
-						<input type="text" name="add-ingred-unit" id="add-ingred-unit">
-					</div>
-					<div style="display: inline-block">
-						<label for="add-ingred-name" style="display:block">Ingredient</label>
-						<select name="add-ingred-name" id="add-ingred-name">
-						<?php
-						foreach ($ingredients as $ingredient) {
-							echo "<option class=\'ingred-option\'>{$ingredient['ingred_name']}</option>";
-						}
-						?>
-						</select>
-					</div>
-					<input type="submit" value="Add">
-				</form>
-				<span onclick="openCreateIngredient()">Create new ingredient</span>
+			<div id="add-ingredient-panel" class="ingredient-panel">
+				<div class="x-page" onclick="closeAddIngredient()">✕</div>
+				<div class="add-ingred-field">
+					<label for="add-ingred-quantity">Quantity</label>
+					<input type="text" name="add-ingred-quantity" id="add-ingred-quantity">
+				</div>
+				<div class="add-ingred-field">
+					<label for="add-ingred-unit">Unit</label>
+					<input type="text" name="add-ingred-unit" id="add-ingred-unit">
+				</div>
+				<div class="add-ingred-field">
+					<label for="add-ingred-name">Ingredient</label>
+					<select name="add-ingred-name" id="add-ingred-name"></select>
+				</div>
+				<button type="submit" name="save">Add Ingredient to Recipe</button>
 			</div>
-			<button id="new-ingred-button" onclick="openAddIngredient()" contenteditable="false">Add new ingredient</button>
 		</div>
 	</div>
 	<div id="create-ingredient-panel" style="display: none">
@@ -65,43 +56,57 @@
 		</form>
 	</div>
 <script>
+	ingred_dropdown = document.getElementById("add-ingred-name");
+	printIngredients(ingred_dropdown);
+
+	// FUNCTION DEFINITIONS
+
+	// Toggles display of #add-ingredient-panel
 	function openAddIngredient() {
 		var panel = document.getElementById("add-ingredient-panel");
 		panel.style.display = "block";
 	}
+	// Toggles display of #add-ingredient-panel
 	function closeAddIngredient() {
 		var panel = document.getElementById("add-ingredient-panel");
 		panel.style.display = "none";
 	}
+	// Toggles display of #create-ingredient-panel
 	function openCreateIngredient() {
 		var panel = document.getElementById("create-ingredient-panel");
 		panel.style.display = "block";
 	}
+	// Toggles display of #create-ingredient-panel
 	function closeCreateIngredient() {
 		var panel = document.getElementById("create-ingredient-panel");
 		panel.style.display = "none";
 	}
+	// Main function to handle text entry into recipe body divs
+	// Handles "Enter", "Shift + Enter", & "Delete" functionality
 	function textHandler(e, elem) {
 		if (e.key === "Enter") {
 			e.preventDefault();
-			var newParagraph = document.createElement("p");
-			newParagraph.classList.add("recipe-paragraph");
-			newParagraph.setAttribute('contenteditable', 'true');
-			newParagraph.setAttribute('onkeydown', 'textHandler(event, this)');
-			elem.after(newParagraph);
-			newParagraph.focus();
-			console.log("Pressed enter!");
-			return;
+
+			if (e.shiftKey) {
+				openAddIngredient();
+			}
+			else {
+				var newParagraph = document.createElement("p");
+				newParagraph.classList.add("recipe-paragraph");
+				newParagraph.setAttribute('contenteditable', 'true');
+				newParagraph.setAttribute('onkeydown', 'textHandler(event, this)');
+				elem.after(newParagraph);
+				newParagraph.focus();
+			}
 		}
 		else if (e.key === "Backspace" || e.key === "Delete") {
 			if (elem.textContent == "" && elem.previousElementSibling !== null) {
 				elem.previousElementSibling.focus();
 				elem.remove();
 			}
-			console.log("Pressed delete!");
-			return;
 		}
 	}
+	// Handles user clicks in recipe body text divs to allow user to select appropriate <p> tags
 	function textBoxClick(e, elem) {
 		if (e.target === elem) {
 			paragraphs = [];
@@ -113,9 +118,12 @@
 
 			paragraphs.pop().focus();
 		}
-
-		return;
 	}
+	// Helper function to convert an all lowercase work to a capitalized first letter
+	function capitalize(word) {
+		return word.charAt(0).toUpperCase()+ word.slice(1);
+	}
+	// Pushes new ingredient info entered by the user to the database
 	function saveNewIngredient() {
 		let form_element = document.getElementsByClassName('new-ingred-form');
 		let form_data = new FormData();
@@ -132,6 +140,31 @@
 				document.getElementById('new-ingredient-form').reset();
 				closeCreateIngredient();
 				alert(ajax_request.responseText);
+			}
+		}
+	}
+	// Adds ingredient to the recipe
+	function saveAddIngredient(elem) {
+		quantity = document.getElementById("add-ingred-quantity").value;
+		unit = document.getElementById("add-ingred-unit").value;
+		name = document.getElementById("add-ingred-name").value;
+
+		console.log("Adding " + quantity + " " + unit + " of " + name);
+	}
+	// Adds dropdown options of all ingredients in the database to a given <select> element
+	function printIngredients(elem) {
+		let ajax_request = new XMLHttpRequest();
+		ajax_request.open('POST', 'get_ingredients.php');
+		ajax_request.send();
+		ajax_request.onreadystatechange = function() {
+			if (ajax_request.readyState == 4 && ajax_request.status == 200) {
+				
+				for (ingredient of JSON.parse(ajax_request.responseText)) {
+					let option = document.createElement("option");
+					option.classList.add("ingred-option");
+					option.innerText = ingredient.ingred_name;
+					elem.add(option);
+				}
 			}
 		}
 	}

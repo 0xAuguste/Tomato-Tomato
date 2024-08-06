@@ -1,5 +1,5 @@
 body {
-    background-color: #fef8ea;
+    background-color: #fefaee;
     font-family: 'EB Garamond';
     font-size: 1.1em;
 }
@@ -32,15 +32,44 @@ body {
     border: 2px solid #e3dac9;
     border-radius: 10px;
 }
-.recipe-paragraph {
-    /* border: 1px solid #e3dac9; */
+.user-input:focus-within {
+    outline: 2px solid #829f82;
+}
+.recipe-paragraph:focus {
+    outline: none;
 }
 input, button {
     font-family: inherit;
     text-align: center;
 }
+.add-ingred-field {
+    display: inline-block;
+    margin: 10px;
+}
+.add-ingred-field label {
+    display: block;
+    text-align: center;
+}
+.ingredient-panel {
+    width: fit-content;
+    padding: 10px 20px 10px 10px;
+    border-radius: 10px;
+    background-color: whitesmoke;
+    position: relative;
+}
+.ingredient-panel button {
+    display: block;
+    text-align: center;
+    margin: 10px auto;
+}
+.x-page {
+    right: 10px;
+    top: 10px;
+    position: absolute;
+    cursor: pointer;
+}
 #add-ingredient-panel {
-    border: 1px solid black;
+    display: none;
 }
 #create-ingredient-panel {
     border: 1px solid black;
