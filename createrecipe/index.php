@@ -45,7 +45,11 @@
 					<label for="add-ingred-name">Ingredient</label>
 					<select name="add-ingred-name" id="add-ingred-name"></select>
 				</div>
-				<button type="submit" name="save">Add Ingredient to Recipe</button>
+				<div class="add-ingred-field">
+					<label for="add-ingred-display">Display Text</label>
+					<input type="text" name="add-ingred-display" id="add-ingred-display">
+				</div>
+				<button type="submit" name="save" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
 			</div>
 		</div>
 	</div>
@@ -147,12 +151,35 @@
 		}
 	}
 	// Adds ingredient to the recipe
-	function saveAddIngredient(elem) {
+	function saveAddIngredient() {
+		let newIngredient = document.createElement("p");
+		newIngredient.classList.add("recipe-paragraph");
+		newIngredient.setAttribute('contenteditable', 'true');
+		newIngredient.setAttribute('onkeydown', 'textHandler(event, this)');
+		let ingredientText = document.createElement("span");
+		ingredientText.setAttribute('contenteditable', 'false');
+		ingredientText.classList.add("ingredient-text");
+		ingredientText.setAttribute('onclick', 'editIngredient(this)');
+
 		quantity = document.getElementById("add-ingred-quantity").value;
 		unit = document.getElementById("add-ingred-unit").value;
 		name = document.getElementById("add-ingred-name").value;
+		display = document.getElementById("add-ingred-display").value;
 
-		console.log("Adding " + quantity + " " + unit + " of " + name);
+		ingredientText.innerText = display;
+		newIngredient.append(ingredientText);
+		previousPara = document.getElementById("add-ingredient-panel").previousElementSibling
+		previousPara.after(newIngredient);
+		if (previousPara.innerText === "") {
+			previousPara.remove();
+		}
+
+		closeAddIngredient();
+		newIngredient.focus();
+	}
+	// Opens ingredient editor for clicked ingredient
+	function editIngredient(ingred) {
+		
 	}
 	// Adds dropdown options of all ingredients in the database to a given <select> element
 	function printIngredients(elem) {
