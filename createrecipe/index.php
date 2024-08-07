@@ -6,6 +6,7 @@
 	<title>Recipe Creator</title>
 	<link href='https://fonts.googleapis.com/css?family=EB Garamond' rel='stylesheet'>
 	<link href="recipeCreatorStyle.css" type="text/css" rel="stylesheet">
+	<script src="recipeData.js"></script>
 </head>
 <body>
 	<?php
@@ -26,7 +27,9 @@
 		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';">
 		
 		<label for="recipe-description">Recipe Description</label>
-		<div name="recipe-description" id="recipe-description" class="user-input" contenteditable="true"></div>
+		<div name="recipe-description" id="recipe-description" class="user-input">
+			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
+		</div>
 		
 		<label for="recipe-process">Recipe Process</label>
 		<div name="recipe-process" id="recipe-process" class="user-input" onclick="textBoxClick(event, this)">
@@ -52,6 +55,7 @@
 				<button type="submit" name="save" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
 			</div>
 		</div>
+		<p id="shift-note"><b>Shift + Return</b> to add an ingredient</p>
 	</div>
 	<div id="create-ingredient-panel" style="display: none">
 		<form id="new-ingredient-form">
@@ -63,8 +67,9 @@
 		</form>
 	</div>
 <script>
-	ingred_dropdown = document.getElementById("add-ingred-name");
-	printIngredients(ingred_dropdown);
+	ingredDropdown = document.getElementById("add-ingred-name");
+	printIngredients(ingredDropdown);
+	let recipeData = new RecipeData();
 
 	// FUNCTION DEFINITIONS
 
@@ -94,7 +99,7 @@
 		if (e.key === "Enter") {
 			e.preventDefault();
 
-			if (e.shiftKey) {
+			if (e.shiftKey && elem.parentElement.id === "recipe-process") {
 				openAddIngredient();
 			}
 			else {
@@ -110,6 +115,10 @@
 			if (elem.textContent == "" && elem.previousElementSibling !== null) {
 				elem.previousElementSibling.focus();
 				elem.remove();
+			}
+			else if (elem.children.length && elem.children[0].innerText === elem.innerText) {
+				recipeData.removeIngredientByID(elem.children[0].id); // remove ingredient from data
+				elem.children[0].remove(); // remove ingredient text span
 			}
 		}
 	}
@@ -160,15 +169,19 @@
 		ingredientText.setAttribute('contenteditable', 'false');
 		ingredientText.classList.add("ingredient-text");
 		ingredientText.setAttribute('onclick', 'editIngredient(this)');
+		let id = Date.now();
+		ingredientText.id = id;
 
-		quantity = document.getElementById("add-ingred-quantity").value;
-		unit = document.getElementById("add-ingred-unit").value;
-		name = document.getElementById("add-ingred-name").value;
-		display = document.getElementById("add-ingred-display").value;
+		let name = document.getElementById("add-ingred-name").value;
+		let quantity = document.getElementById("add-ingred-quantity").value;
+		let unit = document.getElementById("add-ingred-unit").value;
 
-		ingredientText.innerText = display;
+		let ingredient = new Ingredient(id, name, quantity, unit);
+		recipeData.addIngredient(ingredient);
+
+		ingredientText.innerText = document.getElementById("add-ingred-display").value;
 		newIngredient.append(ingredientText);
-		previousPara = document.getElementById("add-ingredient-panel").previousElementSibling
+		let previousPara = document.getElementById("add-ingredient-panel").previousElementSibling
 		previousPara.after(newIngredient);
 		if (previousPara.innerText === "") {
 			previousPara.remove();
@@ -176,6 +189,7 @@
 
 		closeAddIngredient();
 		newIngredient.focus();
+		console.log(recipeData);
 	}
 	// Opens ingredient editor for clicked ingredient
 	function editIngredient(ingred) {
