@@ -11,16 +11,19 @@
 	<?php
 	define('__ROOT__', dirname(dirname(__FILE__)));
 	require_once(__ROOT__.'/databaseKeys.php');
+	require_once(__ROOT__.'/printers.php');
 
 	$dbh = new PDO(DB_DSN, DB_USER, DB_PASSWORD);
 
 	$sth = $dbh->prepare("SELECT ingred_name FROM ingredient");
 	$sth->execute();
 	$ingredients = $sth->fetchAll();
+
+	printHeader();
 	?>
 	
 	<div id="recipe-body">
-		<input type="text" name="recipe-title" id="recipe-title" placeholder="Recipe Name">
+		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';">
 		
 		<label for="recipe-description">Recipe Description</label>
 		<div name="recipe-description" id="recipe-description" class="user-input" contenteditable="true"></div>
