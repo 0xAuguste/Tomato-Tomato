@@ -4,7 +4,9 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Recipe Creator</title>
-	<link href='https://fonts.googleapis.com/css?family=EB Garamond' rel='stylesheet'>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+	</style>
 	<link href="recipeCreatorStyle.css" type="text/css" rel="stylesheet">
 	<script src="recipeData.js"></script>
 </head>
@@ -24,15 +26,15 @@
 	?>
 	
 	<div id="recipe-body">
-		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';">
+		<input name="recipe-title" class="text-entry" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';">
 		
 		<label for="recipe-description">Recipe Description</label>
-		<div name="recipe-description" id="recipe-description" class="user-input">
+		<div name="recipe-description" id="recipe-description" class="user-input text-entry">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
 		</div>
 		
 		<label for="recipe-process">Recipe Process</label>
-		<div name="recipe-process" id="recipe-process" class="user-input" onclick="textBoxClick(event, this)">
+		<div name="recipe-process" id="recipe-process" class="user-input text-entry" onclick="textBoxClick(event, this)">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
 			<div id="add-ingredient-panel" class="ingredient-panel">
 				<div class="x-page" onclick="closeAddIngredient()">✕</div>
