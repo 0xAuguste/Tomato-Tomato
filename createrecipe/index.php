@@ -6,6 +6,7 @@
 	<title>Recipe Creator</title>
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 	</style>
 	<link href="recipeCreatorStyle.css" type="text/css" rel="stylesheet">
 	<script src="recipeData.js"></script>
@@ -28,23 +29,30 @@
 	<div id="recipe-body">
 		<input name="recipe-title" class="text-entry" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';">
 		
-		<label for="recipe-description">Recipe Description</label>
-		<div name="recipe-description" id="recipe-description" class="user-input text-entry">
+		<h4 class="section-label">Recipe Description</h4>
+		<div name="recipe-description" id="recipe-description" class="user-input text-entry" onclick="textBoxClick(event, this)">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
 		</div>
 		
-		<label for="recipe-process">Recipe Process</label>
+		<h4 class="section-label">Recipe Process</h4>
 		<div name="recipe-process" id="recipe-process" class="user-input text-entry" onclick="textBoxClick(event, this)">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
 			<div id="add-ingredient-panel" class="ingredient-panel">
 				<div class="x-page" onclick="closeAddIngredient()">✕</div>
 				<div class="add-ingred-field">
 					<label for="add-ingred-quantity">Quantity</label>
-					<input type="text" name="add-ingred-quantity" id="add-ingred-quantity">
+					<input type="number" name="add-ingred-quantity" id="add-ingred-quantity">
 				</div>
 				<div class="add-ingred-field">
 					<label for="add-ingred-unit">Unit</label>
-					<input type="text" name="add-ingred-unit" id="add-ingred-unit">
+					<select name="add-ingred-unit" id="add-ingred-unit"></select>
+				</div>
+				<div class="add-ingred-field">
+					<label for="add-ingred-test">Test</label>
+					<input type="text" name="add-ingred-test" id="add-ingred-test" onkeyup="optionFilter(this, 'ingredient', 'ingred_name')">
+					<ul class="dropdown-list">
+
+					</ul>
 				</div>
 				<div class="add-ingred-field">
 					<label for="add-ingred-name">Ingredient</label>
@@ -69,8 +77,8 @@
 		</form>
 	</div>
 <script>
-	ingredDropdown = document.getElementById("add-ingred-name");
-	printIngredients(ingredDropdown);
+	printOptions(document.getElementById("add-ingred-unit"), 'unit', 'name');
+	printOptions(document.getElementById("add-ingred-name"), 'ingredient', 'ingred_name');
 	let recipeData = new RecipeData();
 
 	// FUNCTION DEFINITIONS
@@ -137,6 +145,38 @@
 			paragraphs.pop().focus();
 		}
 	}
+	function optionFilter(elem, tableName, colName) {
+		let queryString = elem.value.toUpperCase();
+		let list = elem.parentElement.getElementsByTagName('ul')[0];
+		list.innerHTML = ""; // clear old options
+
+		let options = getOptionList(tableName, colName);
+		console.log(options);
+		for (row of options) {
+			let optionText = row[colName].toUpperCase();
+			if (optionText.indexOf(queryString) > -1) {
+				let listItem = document.createElement("li");
+				listItem.classList.add("dropdown-option");
+				list.add(listItem);
+			}
+		}
+	}
+	function getOptionList(tableName, colName) {
+		let ajax_request = new XMLHttpRequest();
+		ajax_request.open('POST', 'get_options.php');
+		let form_data = new FormData();
+		form_data.append("table", tableName);
+		form_data.append("column", colName);
+
+		ajax_request.send(form_data);
+		ajax_request.onreadystatechange = function() {
+			if (ajax_request.readyState == 4 && ajax_request.status == 200) {
+				json_response = JSON.parse(ajax_request.responseText);
+			}
+		}
+
+		return json_response;
+	}
 	// Helper function to convert an all lowercase work to a capitalized first letter
 	function capitalize(word) {
 		return word.charAt(0).toUpperCase()+ word.slice(1);
@@ -197,19 +237,22 @@
 	function editIngredient(ingred) {
 		
 	}
-	// Adds dropdown options of all ingredients in the database to a given <select> element
-	function printIngredients(elem) {
+	// Pulls a column from the database and adds each row as an option to a given <select> element
+	function printOptions(parent, tableName, colName) {
 		let ajax_request = new XMLHttpRequest();
-		ajax_request.open('POST', 'get_ingredients.php');
-		ajax_request.send();
+		ajax_request.open('POST', 'get_options.php');
+		let form_data = new FormData();
+		form_data.append("table", tableName);
+		form_data.append("column", colName);
+
+		ajax_request.send(form_data);
 		ajax_request.onreadystatechange = function() {
 			if (ajax_request.readyState == 4 && ajax_request.status == 200) {
-				
-				for (ingredient of JSON.parse(ajax_request.responseText)) {
+				for (row of JSON.parse(ajax_request.responseText)) {
 					let option = document.createElement("option");
-					option.classList.add("ingred-option");
-					option.innerText = ingredient.ingred_name;
-					elem.add(option);
+					option.classList.add("select-option");
+					option.innerText = row[colName];
+					parent.add(option);
 				}
 			}
 		}

@@ -7,7 +7,7 @@
     src: url(../LoficottagefreeRegular-BW4O8.otf);
 }
 body {
-    background-color: #fefaee;
+    background-color: rgb(249, 246, 238);
     font-family: 'EB Garamond';
     font-size: 1.1em;
     margin: 0;
@@ -41,8 +41,10 @@ a {
 }
 #nav-bar a {
     margin: 0.5rem 1rem;
-    font-family: stamp;
-    color: black;
+    font-family: Poppins;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #625d55;
 }
 #nav-bar a:hover {
     color: rgb(254, 125, 33);
@@ -52,33 +54,40 @@ a {
     width: min(60%, 800px);
     padding: 30px;
 }
-.text-entry {
-    border: 5px solid #9bba9b;
-    border-radius: 10px;
-    background-color: #fffdf8;
-}
 #recipe-title {
     display: block;
-    margin: 0 auto 2rem;
+    margin: 0 auto 3rem;
     max-width: 100%;
     min-width: fit-content;
-    height: 5rem;
     font-size: 2rem;
     font-style: oblique;
     font-weight: 700;
+    padding: 1rem;
 }
-.text-entry:focus-within {
-    outline: 2px solid #829f82;
+.section-label {
+    font-family: Poppins;
+    margin: 0 0 0.3rem 0.5rem;;
+    font-size: 1rem;
+    color: #625d55;
+    font-weight: 600;
 }
 #recipe-description {
     min-height: 50px;
-    margin-bottom: 2rem;
+    margin-bottom: 4rem;
 }
 #recipe-process {
     min-height: 100px;
 }
+.text-entry {
+    border: 1px solid #9bba9b;
+    border-radius: 5px;
+    background-color: #fffdf8;
+}
+.text-entry:focus-within {
+    outline: 5px solid #9bba9b;
+}
 .user-input {
-    margin: 10px auto;
+    margin: 0 auto;
     padding: 5px 20px;
 }
 .recipe-paragraph:focus{
@@ -102,8 +111,10 @@ input, button {
     border-radius: 10px;
     background-color: #f8edae;
     position: relative;
-    font-family: Verdana;
+    font-family: Poppins;
     font-size: 1rem;
+    font-weight: 600;
+    color: #625d55;
 }
 .ingredient-panel input {
     border: 1px solid #829f82;
@@ -155,11 +166,11 @@ input, button {
 }
 #shift-note {
     float: right;
-    font-size: 0.7rem;
-    font-family: Verdana;
+    font-size: 0.8rem;
+    font-family: Poppins;
     color: #a8a297;
     position: relative;
-    top: -3px;
-    margin-top: 0;
+    margin-top: 5px;
     margin-right: 1rem;
+
 }
