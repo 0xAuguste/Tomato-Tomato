@@ -1,8 +1,7 @@
 <?php
 if(isset($_POST['new-ingred-name'])) { 
     try {
-        define('__ROOT__', dirname(dirname(__FILE__)));
-	    require_once(__ROOT__.'/databaseKeys.php');
+	    require_once('databaseKeys.php');
 
         $dbh = new PDO(DB_DSN, DB_USER, DB_PASSWORD);
     
