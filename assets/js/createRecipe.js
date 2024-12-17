@@ -98,7 +98,7 @@ function getOptionList(tableName, colName) {
 
     return json_response;
 }
-// Helper function to convert an all lowercase work to a capitalized first letter
+// Helper function to convert an all lowercase word to a capitalized first letter
 function capitalize(word) {
     return word.charAt(0).toUpperCase()+ word.slice(1);
 }
