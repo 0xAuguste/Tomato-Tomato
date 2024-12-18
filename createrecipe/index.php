@@ -69,6 +69,7 @@
 		</form>
 	</div>
 
+	<script src="/assets/js/db-handler.js"></script>
 	<script src="/assets/js/recipeData.js"></script>
 	<script src="/assets/js/createRecipe.js"></script>
 </body>

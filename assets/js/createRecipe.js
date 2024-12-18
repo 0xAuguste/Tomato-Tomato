@@ -1,5 +1,5 @@
 printOptions(document.getElementById("add-ingred-unit"), 'unit', 'name');
-printOptions(document.getElementById("add-ingred-name"), 'ingredient', 'ingred_name');
+printOptions(document.getElementById("add-ingred-name"), 'ingredient', 'name');
 let recipeData = new RecipeData();
 
 // FUNCTION DEFINITIONS
@@ -159,23 +159,13 @@ function editIngredient(ingred) {
     
 }
 // Pulls a column from the database and adds each row as an option to a given <select> element
-function printOptions(parent, tableName, colName) {
-    let ajax_request = new XMLHttpRequest();
-    ajax_request.open('POST', '/backend/DB/get_options.php');
-    let form_data = new FormData();
-    form_data.append("table", tableName);
-    form_data.append("column", colName);
+async function printOptions(parent, tableName, colName) {
+    let options = await getTableRows(tableName);
 
-    ajax_request.send(form_data);
-    ajax_request.onreadystatechange = function() {
-        if (ajax_request.readyState == 4 && ajax_request.status == 200) {
-            console.log(ajax_request.responseText);
-            for (row of JSON.parse(ajax_request.responseText)) {
-                let option = document.createElement("option");
-                option.classList.add("select-option");
-                option.innerText = row[colName];
-                parent.add(option);
-            }
-        }
+    for (row of options) {
+        let option = document.createElement("option");
+        option.classList.add("select-option");
+        option.innerText = row;
+        parent.add(option);
     }
 }
