@@ -1,5 +1,5 @@
 printOptions(document.getElementById("add-ingred-unit"), 'unit', 'name');
-printOptions(document.getElementById("add-ingred-name"), 'ingredient', 'ingred_name');
+printOptions(document.getElementById("add-ingred-name"), 'ingredient', 'name');
 let recipeData = new RecipeData();
 
 // FUNCTION DEFINITIONS
@@ -66,37 +66,22 @@ function textBoxClick(e, elem) {
         paragraphs.pop().focus();
     }
 }
-function optionFilter(elem, tableName, colName) {
+async function optionFilter(elem, tableName) {
     let queryString = elem.value.toUpperCase();
     let list = elem.parentElement.getElementsByTagName('ul')[0];
     list.innerHTML = ""; // clear old options
 
-    let options = getOptionList(tableName, colName);
+    let options = await getTableRows(tableName);
     console.log(options);
     for (row of options) {
-        let optionText = row[colName].toUpperCase();
+        let optionText = row.toUpperCase();
         if (optionText.indexOf(queryString) > -1) {
             let listItem = document.createElement("li");
+            listItem.innerHTML = row;
             listItem.classList.add("dropdown-option");
-            list.add(listItem);
+            list.append(listItem);
         }
     }
-}
-function getOptionList(tableName, colName) {
-    let ajax_request = new XMLHttpRequest();
-    ajax_request.open('POST', '/backend/DB/get_options.php');
-    let form_data = new FormData();
-    form_data.append("table", tableName);
-    form_data.append("column", colName);
-
-    ajax_request.send(form_data);
-    ajax_request.onreadystatechange = function() {
-        if (ajax_request.readyState == 4 && ajax_request.status == 200) {
-            json_response = JSON.parse(ajax_request.responseText);
-        }
-    }
-
-    return json_response;
 }
 // Helper function to convert an all lowercase word to a capitalized first letter
 function capitalize(word) {
@@ -159,23 +144,13 @@ function editIngredient(ingred) {
     
 }
 // Pulls a column from the database and adds each row as an option to a given <select> element
-function printOptions(parent, tableName, colName) {
-    let ajax_request = new XMLHttpRequest();
-    ajax_request.open('POST', '/backend/DB/get_options.php');
-    let form_data = new FormData();
-    form_data.append("table", tableName);
-    form_data.append("column", colName);
+async function printOptions(parent, tableName, colName) {
+    let options = await getTableRows(tableName);
 
-    ajax_request.send(form_data);
-    ajax_request.onreadystatechange = function() {
-        if (ajax_request.readyState == 4 && ajax_request.status == 200) {
-            console.log(ajax_request.responseText);
-            for (row of JSON.parse(ajax_request.responseText)) {
-                let option = document.createElement("option");
-                option.classList.add("select-option");
-                option.innerText = row[colName];
-                parent.add(option);
-            }
-        }
+    for (row of options) {
+        let option = document.createElement("option");
+        option.classList.add("select-option");
+        option.innerText = row;
+        parent.add(option);
     }
 }

@@ -41,7 +41,7 @@
 				</div>
 				<div class="add-ingred-field">
 					<label for="add-ingred-test">Test</label>
-					<input type="text" name="add-ingred-test" id="add-ingred-test" onkeyup="optionFilter(this, 'ingredient', 'ingred_name')">
+					<input type="text" name="add-ingred-test" id="add-ingred-test" onkeyup="optionFilter(this, 'ingredient')">
 					<ul class="dropdown-list">
 
 					</ul>
@@ -69,6 +69,7 @@
 		</form>
 	</div>
 
+	<script src="/assets/js/db-handler.js"></script>
 	<script src="/assets/js/recipeData.js"></script>
 	<script src="/assets/js/createRecipe.js"></script>
 </body>
