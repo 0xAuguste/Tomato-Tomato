@@ -1,3 +1,4 @@
+// Function to return all rows of given table in column 'name'
 async function getTableRows(table) {
     let valid_tables = ['ingredient', 'ingredientCategory', 'cuisine', 'meal', 'recipe', 'season',
                         'season', 'source', 'type', 'unit']; // List of allowed tables
@@ -20,6 +21,7 @@ async function getTableRows(table) {
     }
 }
 
+// Function to add a new ingredient to the database of given name and category
 function addNewIngredientEntry(name, category) {
     let path = '/backend/DB/new_ingredient.php';
 
