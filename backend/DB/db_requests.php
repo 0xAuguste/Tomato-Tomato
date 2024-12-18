@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-header("Access-Control-Allow-Methods: POST, GET");
+header("Access-Control-Allow-Methods: GET");
 
 try {
     require_once('databaseKeys.php');
@@ -29,7 +29,8 @@ if (in_array($table, $validTables)) {
         } else {
             echo json_encode(["message" => "No records found."]);
         }
-    } catch (PDOException $e) {
+    }
+    catch (PDOException $e) {
         echo json_encode(["error" => "Error executing query: " . $e->getMessage()]);
     }
 } else {
