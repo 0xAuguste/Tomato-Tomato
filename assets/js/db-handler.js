@@ -1,7 +1,7 @@
-// Function to return all rows of given table in column 'name'
+// Function to return all rows of given table,  with 'id' and 'name'
 async function getTableRows(table) {
     let valid_tables = ['ingredient', 'ingredientCategory', 'cuisine', 'meal', 'recipe', 'season',
-                        'season', 'source', 'type', 'unit']; // List of allowed tables
+                        'source', 'type', 'unit']; // List of allowed tables
 
     if (valid_tables.includes(table)) { // user entered valid table name
         let request = `/backend/DB/db_requests.php?table=${table}`;
@@ -9,15 +9,16 @@ async function getTableRows(table) {
         try {
             let response = await fetch(request);
             let data = await response.json();
-            return data.map(item => item.name);  // Return the array of names
+            return data;
         }
         catch (error) {
             console.error("Error fetching data:", error);
+            return []; // Return empty array on error for consistency
         }
     }
     else {
-        console.log('Invalid table');
-        return; // Return nothing for invalid table
+        console.log('Invalid table:', table);
+        return []; // Return empty array for invalid table
     }
 }
 
@@ -37,4 +38,31 @@ function addNewIngredientEntry(name, category) {
     .then(response => response.json()) // Convert response to JSON
     .then(response_json => console.log(response_json))
     .catch(error => console.error('Error adding new ingredient:', error));
+}
+
+// Function to save a new recipe to the database
+async function saveRecipeEntry(recipeDataPayload) {
+    const path = '/backend/DB/save_recipe.php'; // This is the PHP file you'll create
+
+    try {
+        const response = await fetch(path, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Essential to tell PHP you're sending JSON
+            },
+            body: JSON.stringify(recipeDataPayload) // Send the entire recipe object as JSON
+        });
+
+        if (!response.ok) {
+            // If the response is not OK (e.g., 404, 500), throw an error
+            const errorText = await response.text(); // Get response body for more details
+            throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+        }
+
+        const responseJson = await response.json(); // Assuming your PHP will return JSON
+        return responseJson; // Return the response from the server
+    } catch (error) {
+        console.error('Error saving recipe:', error);
+        throw error;
+    }
 }
