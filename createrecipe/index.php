@@ -19,7 +19,7 @@
 	?>
 	
 	<div id="recipe-body">
-		<input name="recipe-title" class="text-entry" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';">
+		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';" autocomplete="off">
 		
 		<h4 class="section-label">Recipe Description</h4>
 		<div name="recipe-description" id="recipe-description" class="user-input text-entry" onclick="textBoxClick(event, this)">
@@ -29,11 +29,18 @@
 		<h4 class="section-label">Recipe Process</h4>
 		<div name="recipe-process" id="recipe-process" class="user-input text-entry" onclick="textBoxClick(event, this)">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
-			<div id="add-ingredient-panel" class="ingredient-panel">
-				<div class="x-page" onclick="closeAddIngredient()">✕</div>
+		</div>
+		<p id="shift-note"><b>Shift + Return</b> to add an ingredient</p>
+	</div>
+
+	<div id="add-ingredient-panel" style="display: none">
+		<div class="ingredient-panel-content">
+			<span class="close-button" onclick="closeAddIngredient()">&times;</span>
+
+			<div class="ingredient-panel">
 				<div class="add-ingred-field">
 					<label for="add-ingred-quantity">Quantity</label>
-					<input type="number" name="add-ingred-quantity" id="add-ingred-quantity">
+					<input type="text" name="add-ingred-quantity" id="add-ingred-quantity">
 				</div>
 				<div class="add-ingred-field">
 					<label for="add-ingred-unit">Unit</label>
@@ -45,13 +52,13 @@
 				</div>
 				<div class="add-ingred-field">
 					<label for="add-ingred-display">Display Text</label>
-					<input type="text" name="add-ingred-display" id="add-ingred-display">
+					<input type="text" name="add-ingred-display" id="add-ingred-display" autocomplete="off">
 				</div>
 				<button type="submit" name="save" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
 			</div>
 		</div>
-		<p id="shift-note"><b>Shift + Return</b> to add an ingredient</p>
 	</div>
+
 	<div id="create-ingredient-panel" style="display: none">
 		<form id="new-ingredient-form">
 			<label for="new-ingred-name">Name</label>

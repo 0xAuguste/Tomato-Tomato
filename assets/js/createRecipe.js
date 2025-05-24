@@ -7,7 +7,7 @@ let recipeData = new RecipeData();
 // Toggles display of #add-ingredient-panel
 function openAddIngredient() {
     var panel = document.getElementById("add-ingredient-panel");
-    panel.style.display = "block";
+    panel.style.display = "flex";
 }
 // Toggles display of #add-ingredient-panel
 function closeAddIngredient() {
@@ -17,7 +17,7 @@ function closeAddIngredient() {
 // Toggles display of #create-ingredient-panel
 function openCreateIngredient() {
     var panel = document.getElementById("create-ingredient-panel");
-    panel.style.display = "block";
+    panel.style.display = "flex";
 }
 // Toggles display of #create-ingredient-panel
 function closeCreateIngredient() {
@@ -138,7 +138,7 @@ function saveAddIngredient() {
 
     ingredientText.innerText = document.getElementById("add-ingred-display").value;
     newParagraph.append(ingredientText);
-    let previousPara = document.getElementById("add-ingredient-panel").previousElementSibling
+    let previousPara = document.getElementById("recipe-process").lastElementChild;
     previousPara.after(newParagraph);
     if (previousPara.innerText === "") {
         previousPara.remove();

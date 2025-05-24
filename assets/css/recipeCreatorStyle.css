@@ -63,6 +63,12 @@ a {
     font-style: oblique;
     font-weight: 700;
     padding: 1rem;
+    background: none;
+    border: none;
+    
+}
+#recipe-title:focus {
+    outline: none;
 }
 .section-label {
     font-family: Poppins;
@@ -82,6 +88,8 @@ a {
     border: 2px solid #9bba9b;
     border-radius: 5px;
     background-color: #fffdf8;
+    transition: outline 0.3s ease;
+    outline: 0px solid #9bba9b;
 }
 .text-entry:focus-within {
     outline: 5px solid #9bba9b;
@@ -97,58 +105,126 @@ input, button {
     font-family: inherit;
     text-align: center;
 }
-.add-ingred-field {
-    display: inline-block;
-    margin: 10px;
+/* Styling for the overall panel container */
+#add-ingredient-panel {
+    display: none; /* Hidden by default, toggled by JS */
+    position: fixed; /* Stays in place relative to the viewport */
+    z-index: 100; /* On top of everything */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if content is too long */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity - a semi-transparent overlay */
+    display: flex; /* Use flexbox to center content easily */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
 }
-.add-ingred-field label {
-    display: block;
-    text-align: center;
+
+/* Styling for the content wrapper inside the panel */
+.ingredient-panel-content {
+    background-color: #fefefe; /* White background for the modal itself */
+    margin: auto; /* Auto margins for older browser centering */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be responsive or fixed max-width */
+    max-width: 500px; /* Max width to prevent it from getting too wide on large screens */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); /* Subtle shadow */
+    animation-name: animatetop;
+    animation-duration: 0.5s;
+    position: relative; /* Needed for close button positioning */
 }
+
+/* Add an animation for the modal appearance */
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
 .ingredient-panel {
-    width: fit-content;
-    padding: 10px 20px 10px 10px;
-    border-radius: 10px;
-    background-color: #f8edae;
-    position: relative;
+    width: 100%;
+    padding: 0;
+    background-color: transparent; /* Remove background, as it's on .ingredient-panel-content */
     font-family: Poppins;
     font-size: 1rem;
     font-weight: 600;
     color: #625d55;
+    display: flex; /* Use flexbox for fields */
+    flex-wrap: wrap; /* Allow fields to wrap to next line */
+    justify-content: space-around; /* Distribute fields evenly */
+    align-items: flex-end; /* Align fields at the bottom (for quantity/unit) */
 }
-.ingredient-panel input {
+
+/* Adjustments for input fields and labels */
+.add-ingred-field {
+    display: flex; /* Change to flex for vertical stacking of label and input */
+    flex-direction: column; /* Stack label above input */
+    margin: 10px; /* Consistent margin around fields */
+    flex-grow: 1; /* Allow fields to grow to fill space */
+    min-width: 120px; /* Ensure fields don't get too small */
+}
+
+.add-ingred-field label {
+    text-align: left; /* Align labels to the left */
+    margin-bottom: 5px; /* Space between label and input */
+    font-weight: 500; /* Slightly lighter weight for labels */
+    font-size: 0.9em; /* Smaller font for labels */
+}
+
+.ingredient-panel input,
+.ingredient-panel select {
     border: 1px solid #829f82;
     border-radius: 5px;
-    margin-top: 5px;
-    padding: 5px;
+    padding: 8px; /* Increase padding for better clickability */
+    width: 100%; /* Fill the container */
+    box-sizing: border-box; /* Include padding/border in width */
+    font-size: 1em; /* Consistent font size */
+    font-family: Poppins; /* Use Poppins for inputs as well */
 }
+
+/* Specific width adjustments for quantity field */
+#add-ingred-quantity {
+    width: auto; /* Let flexbox manage width, remove fixed width */
+    max-width: 80px; /* Optional: cap its max width */
+}
+
+/* Adjustments for buttons */
 .ingredient-panel button {
     display: block;
     text-align: center;
-    margin: 10px auto;
-    padding: 5px 15px;
-    background-color: #fffdf8;
-    font-family: Verdana;
-    border-radius: 10px;
-    border: 3px solid #829f82;
+    margin: 20px auto 0 auto; /* More margin above, center horizontally */
+    padding: 10px 20px; /* Larger padding for better click area */
+    background-color: #829f82; /* More prominent background color */
+    color: #fffdf8; /* White text for contrast */
+    font-family: Poppins; /* Consistent font */
+    border-radius: 5px; /* Slightly less rounded for a modern look */
+    border: none; /* No border, let background color define it */
     cursor: pointer;
-    font-weight: bold;
-    color: #8d816c;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
 }
-#add-ingred-quantity {
-    width: 5rem;
+
+.ingredient-panel button:hover {
+    background-color: #6a806a; /* Darker green on hover */
 }
-#add-ingred-unit {
-    width: 7rem;
-}
-.x-page {
-    right: 10px;
-    top: 10px;
+
+.close-button {
+    color: #aaa;
     position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 28px;
+    font-weight: bold;
     cursor: pointer;
 }
-.x-page:hover {
-    color: #829f82;
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 .ingredient-text {
     background-color: #f8edae;
@@ -157,9 +233,6 @@ input, button {
     margin-left: 2rem;
     font-weight: 700;
     cursor: pointer;
-}
-#add-ingredient-panel {
-    display: none;
 }
 #create-ingredient-panel {
     border: 1px solid black;
