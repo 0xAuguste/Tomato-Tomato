@@ -77,6 +77,10 @@ a {
     color: #625d55;
     font-weight: 600;
 }
+.section-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
 #recipe-description {
     min-height: 50px;
     margin-bottom: 4rem;
@@ -88,11 +92,11 @@ a {
     border: 2px solid #9bba9b;
     border-radius: 5px;
     background-color: #fffdf8;
-    transition: outline 0.3s ease;
+    transition: outline 0.2s ease, background-color 0.2s;
     outline: 0px solid #9bba9b;
 }
 .text-entry:focus-within {
-    outline: 5px solid #9bba9b;
+    outline: 4px solid #9bba9b;
 }
 .user-input {
     margin: 0 auto;
@@ -126,7 +130,6 @@ input, button {
     background-color: #fefefe; /* White background for the modal itself */
     margin: auto; /* Auto margins for older browser centering */
     padding: 20px;
-    border: 1px solid #888;
     width: 80%; /* Could be responsive or fixed max-width */
     max-width: 500px; /* Max width to prevent it from getting too wide on large screens */
     border-radius: 10px; /* Rounded corners */
@@ -194,14 +197,14 @@ input, button {
     display: block;
     text-align: center;
     margin: 20px auto 0 auto; /* More margin above, center horizontally */
-    padding: 10px 20px; /* Larger padding for better click area */
+    padding: 5px 10px; /* Larger padding for better click area */
     background-color: #829f82; /* More prominent background color */
     color: #fffdf8; /* White text for contrast */
     font-family: Poppins; /* Consistent font */
     border-radius: 5px; /* Slightly less rounded for a modern look */
     border: none; /* No border, let background color define it */
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 1.1em;
     transition: background-color 0.3s ease; /* Smooth hover effect */
 }
@@ -213,7 +216,7 @@ input, button {
 .close-button {
     color: #aaa;
     position: absolute;
-    top: 10px;
+    top: 5px;
     right: 10px;
     font-size: 28px;
     font-weight: bold;

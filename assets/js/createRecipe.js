@@ -9,21 +9,25 @@ function openAddIngredient() {
     var panel = document.getElementById("add-ingredient-panel");
     panel.style.display = "flex";
 }
+
 // Toggles display of #add-ingredient-panel
 function closeAddIngredient() {
     var panel = document.getElementById("add-ingredient-panel");
     panel.style.display = "none";
 }
+
 // Toggles display of #create-ingredient-panel
 function openCreateIngredient() {
     var panel = document.getElementById("create-ingredient-panel");
     panel.style.display = "flex";
 }
+
 // Toggles display of #create-ingredient-panel
 function closeCreateIngredient() {
     var panel = document.getElementById("create-ingredient-panel");
     panel.style.display = "none";
 }
+
 // Main function to handle text entry into recipe body divs
 // Handles "Enter", "Shift + Enter", & "Delete" functionality
 function textHandler(e, elem) {
@@ -44,7 +48,8 @@ function textHandler(e, elem) {
     }
     else if (e.key === "Backspace" || e.key === "Delete") {
         if (elem.textContent == "" && elem.previousElementSibling !== null) {
-            elem.previousElementSibling.focus();
+            e.preventDefault();
+            moveCursorToEnd(elem.previousElementSibling);
             elem.remove();
         }
         else if (elem.children.length && elem.children[0].innerText === elem.innerText) {
@@ -52,7 +57,36 @@ function textHandler(e, elem) {
             elem.children[0].remove(); // remove ingredient text span
         }
     }
+    else if (e.key === "#") {
+        e.preventDefault();
+        elem.classList.toggle("section-header");
+    }
 }
+
+function moveCursorToEnd(element) {
+    if (element && element.lastChild) { // Ensure element exists and has content/children
+        const range = document.createRange();
+        const selection = window.getSelection();
+
+        if (element.lastChild.nodeType === Node.TEXT_NODE) {
+            range.setStart(element.lastChild, element.lastChild.length);
+            range.collapse(true); // Collapse to the end
+        } else {
+            // For elements with HTML content or ingredients, select the element's contents
+            // and collapse to the end. This is a more robust approach.
+            range.selectNodeContents(element);
+            range.collapse(false); // 'false' collapses the range to its end point
+        }
+
+        selection.removeAllRanges(); // Clear any existing selections
+        selection.addRange(range);   // Add the new range, placing the cursor
+        element.focus();
+    } else if (element) {
+        // If the element exists but is empty, just focus it
+        element.focus();
+    }
+}
+
 // Handles user clicks in recipe body text divs to allow user to select appropriate <p> tags
 function textBoxClick(e, elem) {
     if (e.target === elem) {
@@ -66,6 +100,7 @@ function textBoxClick(e, elem) {
         paragraphs.pop().focus();
     }
 }
+
 async function optionFilter(elem, tableName) {
     let queryString = elem.value.toUpperCase();
     let list = elem.parentElement.getElementsByTagName('ul')[0];
@@ -84,10 +119,12 @@ async function optionFilter(elem, tableName) {
         }
     }
 }
+
 // Helper function to convert an all lowercase word to a capitalized first letter
 function capitalize(word) {
     return word.charAt(0).toUpperCase()+ word.slice(1);
 }
+
 // Pushes new ingredient info entered by the user to the database
 function saveNewIngredient() {
     let form_element = document.getElementsByClassName('new-ingred-form');
@@ -110,6 +147,7 @@ function saveNewIngredient() {
         }
     }
 }
+
 // Adds ingredient to the recipe
 function saveAddIngredient() {
     let newParagraph = document.createElement("p");
@@ -145,13 +183,15 @@ function saveAddIngredient() {
     }
 
     closeAddIngredient();
-    newParagraph.focus();
+    moveCursorToEnd(newParagraph);
     console.log(recipeData);
 }
+
 // Opens ingredient editor for clicked ingredient
 function editIngredient(ingred) {
 
 }
+
 // Pulls options from the database and adds each row as an option to a given <select> element
 async function printOptions(parent, tableName) {
     let options = await getTableRows(tableName);
@@ -176,14 +216,14 @@ async function printOptions(parent, tableName) {
 
 // Saves the entire recipe to the database
 async function saveRecipe() {
-    // 1. Get Recipe Title
+    // Get Recipe Title
     recipeData.name = document.getElementById('recipe-title').value;
 
-    // 2. Parse Description and Process from the DOM into recipeData object
+    // Parse Description and Process from the DOM into recipeData object
     recipeData.parseDescription(); // Populates recipeData.description
     recipeData.parseProcess();     // Populates recipeData.process
 
-    // 3. Prepare data for backend. Stringify arrays as PHP expects JSON strings.
+    // Prepare data for backend. Stringify arrays as PHP expects JSON strings.
     const recipePayload = {
         name: recipeData.name,
         description: JSON.stringify(recipeData.description),
@@ -191,15 +231,13 @@ async function saveRecipe() {
         ingredients: JSON.stringify(recipeData.ingredients) // This will contain frontend IDs and DB IDs
     };
 
-    console.log("Recipe Payload to Send:", recipePayload);
+    // console.log("Recipe Payload to Send:", recipePayload);
 
-    // 4. Send data to PHP backend using the helper function from db-handler.js
+    // Send data to PHP backend using the helper function from db-handler.js
     try {
-        const response = await saveRecipeEntry(recipePayload); // Call the helper
+        const response = await saveRecipeEntry(recipePayload); // send data to backend
         console.log(response);
         alert(response.message);
-        // You might want to clear the form or redirect the user here
-        // For example, window.location.href = '/recipes';
     } catch (error) {
         console.error("Failed to save recipe:", error);
         alert("Error saving recipe. Check console for details.");

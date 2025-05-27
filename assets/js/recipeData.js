@@ -50,6 +50,12 @@ class RecipeData {
                             display: ingredientSpan.innerText // Store the display text as well
                         });
                     }
+                }
+                else if (element.classList.contains('section-header')) { // paragraph is a header
+                    structuredProcess.push({
+                        type: 'header',
+                        text: element.innerText 
+                    });
                 } else {
                     // This is a regular paragraph
                     structuredProcess.push({
