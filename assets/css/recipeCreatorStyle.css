@@ -6,11 +6,21 @@
     font-family: stamp;
     src: url(fonts/LoficottagefreeRegular-BW4O8.otf);
 }
+:root {
+    --cream-body: rgb(249, 246, 238);
+    --offwhite: #fffdf8;
+    --chalkboard: #58524b;
+    --stucco: #e3d6c2;
+    --light-fava: #adb57e;
+    --dark-fava: #757e39;
+    --yellow-wall: #edbd5f;
+}
 body {
-    background-color: rgb(249, 246, 238);
-    font-family: 'EB Garamond';
+    background-color: var(--cream-body);
+    font-family: 'EB Garamond', serif;
     font-size: 1.1em;
     margin: 0;
+    color: var(--chalkboard);
 }
 a {
 	text-decoration:none;
@@ -41,40 +51,47 @@ a {
 }
 #nav-bar a {
     margin: 0.5rem 1rem;
-    font-family: Poppins;
+    font-family: 'Poppins', sans-serif;
     font-size: 1rem;
     font-weight: 500;
-    color: #625d55;
+    color: var(--chalkboard);
 }
 #nav-bar a:hover {
-    color: rgb(254, 125, 33);
+    color: var(--dark-fava);
 }
 #recipe-body {
-    margin: 0 auto 3rem;
+    margin: 3rem auto 2rem;
     width: min(60%, 800px);
-    padding: 30px;
+    padding: 30px 30px 3rem;
+    background-color: var(--stucco);
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.08);
+    position: relative;
+    /* Subtle paper texture */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="2" height="2" fill="rgba(0,0,0,0.01)"/><rect x="2" y="2" width="2" height="2" fill="rgba(0,0,0,0.02)"/></svg>');
+    background-blend-mode: multiply;
 }
+
 #recipe-title {
     display: block;
     margin: 0 auto 3rem;
-    max-width: 100%;
     min-width: fit-content;
-    font-size: 2rem;
-    font-style: oblique;
+    max-width: 100%;
+    font-size: 2.3rem;
+    font-style: italic;
     font-weight: 700;
     padding: 1rem;
     background: none;
     border: none;
-    
-}
-#recipe-title:focus {
+    color: var(--chalkboard);
+    border-bottom: 2px solid var(--chalkboard);
     outline: none;
 }
+
 .section-label {
     font-family: Poppins;
-    margin: 0 0 0.3rem 0.5rem;;
+    margin: 0 0 0.7rem 0.3rem;;
     font-size: 1rem;
-    color: #625d55;
     font-weight: 600;
 }
 .section-header {
@@ -89,14 +106,13 @@ a {
     min-height: 100px;
 }
 .text-entry {
-    border: 2px solid #9bba9b;
     border-radius: 5px;
-    background-color: #fffdf8;
-    transition: outline 0.2s ease, background-color 0.2s;
-    outline: 0px solid #9bba9b;
+    background-color: var(--offwhite);
+    transition: outline 0.3s ease, background-color 0.3s;
+    outline: 0px solid white;
 }
 .text-entry:focus-within {
-    outline: 4px solid #9bba9b;
+    outline: 4px solid var(--light-fava);
 }
 .user-input {
     margin: 0 auto;
@@ -109,37 +125,37 @@ input, button {
     font-family: inherit;
     text-align: center;
 }
-/* Styling for the overall panel container */
 #add-ingredient-panel {
-    display: none; /* Hidden by default, toggled by JS */
-    position: fixed; /* Stays in place relative to the viewport */
-    z-index: 100; /* On top of everything */
+    display: none;
+    position: fixed;
+    z-index: 100;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if content is too long */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity - a semi-transparent overlay */
-    display: flex; /* Use flexbox to center content easily */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Styling for the content wrapper inside the panel */
 .ingredient-panel-content {
-    background-color: #fefefe; /* White background for the modal itself */
-    margin: auto; /* Auto margins for older browser centering */
-    padding: 20px;
-    width: 80%; /* Could be responsive or fixed max-width */
-    max-width: 500px; /* Max width to prevent it from getting too wide on large screens */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); /* Subtle shadow */
+    background-color: #fffdf8;
+    margin: auto;
+    padding: 25px;
+    width: 80%;
+    max-width: 550px;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px 0 rgba(0,0,0,0.15);
     animation-name: animatetop;
     animation-duration: 0.5s;
-    position: relative; /* Needed for close button positioning */
+    position: relative;
+    /* Subtle aged paper background texture */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="2" height="2" fill="rgba(0,0,0,0.01)"/><rect x="2" y="2" width="2" height="2" fill="rgba(0,0,0,0.01)"/></svg>');
+    background-blend-mode: multiply;
 }
 
-/* Add an animation for the modal appearance */
 @keyframes animatetop {
     from {top: -300px; opacity: 0}
     to {top: 0; opacity: 1}
@@ -148,105 +164,191 @@ input, button {
 .ingredient-panel {
     width: 100%;
     padding: 0;
-    background-color: transparent; /* Remove background, as it's on .ingredient-panel-content */
-    font-family: Poppins;
+    background-color: transparent;
+    font-family: 'Poppins', sans-serif;
     font-size: 1rem;
-    font-weight: 600;
-    color: #625d55;
-    display: flex; /* Use flexbox for fields */
-    flex-wrap: wrap; /* Allow fields to wrap to next line */
-    justify-content: space-around; /* Distribute fields evenly */
-    align-items: flex-end; /* Align fields at the bottom (for quantity/unit) */
+    font-weight: 500;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: flex-end;
 }
 
-/* Adjustments for input fields and labels */
 .add-ingred-field {
-    display: flex; /* Change to flex for vertical stacking of label and input */
-    flex-direction: column; /* Stack label above input */
-    margin: 10px; /* Consistent margin around fields */
-    flex-grow: 1; /* Allow fields to grow to fill space */
-    min-width: 120px; /* Ensure fields don't get too small */
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    flex-grow: 1;
+    min-width: 120px;
 }
 
 .add-ingred-field label {
-    text-align: left; /* Align labels to the left */
-    margin-bottom: 5px; /* Space between label and input */
-    font-weight: 500; /* Slightly lighter weight for labels */
-    font-size: 0.9em; /* Smaller font for labels */
+    text-align: left;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9em;
 }
 
 .ingredient-panel input,
 .ingredient-panel select {
-    border: 1px solid #829f82;
+    border: 1px solid var(--dark-fava);
     border-radius: 5px;
-    padding: 8px; /* Increase padding for better clickability */
-    width: 100%; /* Fill the container */
-    box-sizing: border-box; /* Include padding/border in width */
-    font-size: 1em; /* Consistent font size */
-    font-family: Poppins; /* Use Poppins for inputs as well */
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1em;
+    font-family: 'Poppins', sans-serif;
+    background-color: #FEFDFC;
+    color: #4A4A4A;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
 }
 
-/* Specific width adjustments for quantity field */
 #add-ingred-quantity {
-    width: auto; /* Let flexbox manage width, remove fixed width */
-    max-width: 80px; /* Optional: cap its max width */
+    width: auto;
+    max-width: 90px;
 }
 
-/* Adjustments for buttons */
 .ingredient-panel button {
     display: block;
     text-align: center;
-    margin: 20px auto 0 auto; /* More margin above, center horizontally */
-    padding: 5px 10px; /* Larger padding for better click area */
-    background-color: #829f82; /* More prominent background color */
-    color: #fffdf8; /* White text for contrast */
-    font-family: Poppins; /* Consistent font */
-    border-radius: 5px; /* Slightly less rounded for a modern look */
-    border: none; /* No border, let background color define it */
+    margin: 20px auto 0 auto;
+    padding: 8px 15px;
+    background-color: var(--light-fava);
+    color: #fffdf8;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 8px;
+    border: none;
     cursor: pointer;
     font-weight: 500;
-    font-size: 1.1em;
-    transition: background-color 0.3s ease; /* Smooth hover effect */
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .ingredient-panel button:hover {
-    background-color: #6a806a; /* Darker green on hover */
+    background-color: var(--dark-fava);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .close-button {
-    color: #aaa;
     position: absolute;
-    top: 5px;
-    right: 10px;
-    font-size: 28px;
-    font-weight: bold;
+    top: 8px;
+    right: 12px;
+    font-size: 30px;
+    font-weight: normal;
     cursor: pointer;
 }
 
 .close-button:hover,
 .close-button:focus {
-    color: black;
+    color: var(--light-fava);
     text-decoration: none;
     cursor: pointer;
 }
 .ingredient-text {
-    background-color: #f8edae;
+    background-color: var(--yellow-wall);
     border-radius: 10px;
     padding: 5px 15px;
     margin-left: 2rem;
     font-weight: 700;
     cursor: pointer;
 }
+
 #create-ingredient-panel {
-    border: 1px solid black;
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+#create-ingredient-panel form {
+    background-color: #FCFBF7;
+    padding: 30px;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px 0 rgba(0,0,0,0.15);
+    position: relative;
+    border: 1px solid #B0A080;
+    /* Subtle aged paper background texture */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="2" height="2" fill="rgba(0,0,0,0.01)"/><rect x="2" y="2" width="2" height="2" fill="rgba(0,0,0,0.01)"/></svg>');
+    background-blend-mode: multiply;
+}
+
+#create-ingredient-panel label {
+    font-family: 'Poppins', sans-serif;
+    color: var(--dark-fava);
+    font-weight: 500;
+    font-size: 0.9em;
+    margin-bottom: -10px;
+}
+
+#create-ingredient-panel input[type="text"] {
+    border: 1px solid var(--light-fava);
+    border-radius: 5px;
+    padding: 8px;
+    font-family: 'Poppins', sans-serif;
+    background-color: #FEFDFC;
+    color: #4A4A4A;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+
+#create-ingredient-panel button[type="submit"] {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: var(--light-fava);
+    color: var(--offwhite);
+    font-family: 'Poppins', sans-serif;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#create-ingredient-panel button[type="submit"]:hover {
+    background-color: var(--dark-fava);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
 #shift-note {
     float: right;
     font-size: 0.8rem;
-    font-family: Poppins;
+    font-family: 'Poppins', sans-serif;
     color: #a8a297;
     position: relative;
-    margin-top: 5px;
-    margin-right: 1rem;
+    margin: 5px 1rem 2rem;
+    font-weight: 500;
+}
+#save-recipe-button {
+    display: block;
+    text-align: center;
+    margin: 0 auto 50px;
+    padding: 10px 20px;
+    background-color: var(--light-fava);
+    color: var(--offwhite);
+    font-family: 'Poppins', sans-serif;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s;
+    letter-spacing: 1px;
+}
 
+#save-recipe-button:hover {
+    background-color: var(--dark-fava);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.22);
 }

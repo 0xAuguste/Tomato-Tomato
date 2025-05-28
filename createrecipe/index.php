@@ -32,6 +32,7 @@
 		</div>
 		<p id="shift-note"><b>Shift + Return</b> to add an ingredient</p>
 	</div>
+	<button type="button" id="save-recipe-button" onclick="saveRecipe()">Save Recipe</button>
 
 	<div id="add-ingredient-panel" style="display: none">
 		<div class="ingredient-panel-content">

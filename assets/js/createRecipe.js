@@ -216,6 +216,10 @@ async function printOptions(parent, tableName) {
 
 // Saves the entire recipe to the database
 async function saveRecipe() {
+    if (!validRecipe()) {
+        return;
+    }
+
     // Get Recipe Title
     recipeData.name = document.getElementById('recipe-title').value;
 
@@ -241,5 +245,41 @@ async function saveRecipe() {
     } catch (error) {
         console.error("Failed to save recipe:", error);
         alert("Error saving recipe. Check console for details.");
+    }
+}
+
+function validRecipe() {
+    const recipeTitle = document.getElementById('recipe-title').value.trim();
+    const recipeProcessContainer = document.getElementById('recipe-process');
+    const recipeProcessParagraphs = recipeProcessContainer.querySelectorAll('.recipe-paragraph');
+
+    let isProcessPopulated = false;
+    if (recipeProcessParagraphs.length > 0) {
+        // Check if at least one non-empty paragraph exists in the process
+        for (const paragraph of recipeProcessParagraphs) {
+            // Check for actual text content, ignoring empty paragraphs created by initial setup
+            if (paragraph.textContent.trim() !== "" || paragraph.querySelector('.ingredient-text')) {
+                isProcessPopulated = true;
+            }
+        }
+    }
+
+    if (recipeTitle === "") {
+        alert("Please enter a recipe title before saving.");
+        document.getElementById('recipe-title').focus();
+        return false;
+    } else if (!isProcessPopulated) {
+        alert("Please add at least one step to the recipe process before saving.");
+        // Try to focus on the last paragraph in process if it exists, or the process container
+        const lastProcessParagraph = recipeProcessContainer.querySelector('.recipe-paragraph:last-child');
+        if (lastProcessParagraph) {
+            moveCursorToEnd(lastProcessParagraph);
+        } else {
+            recipeProcessContainer.focus();
+        }
+        return false;
+    }
+    else {
+        return true;
     }
 }
