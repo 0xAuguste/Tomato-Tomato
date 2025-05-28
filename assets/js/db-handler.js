@@ -40,15 +40,44 @@ function addNewIngredientEntry(name, category) {
     .catch(error => console.error('Error adding new ingredient:', error));
 }
 
-// Function to save a new recipe to the database
-async function saveRecipeEntry(recipeDataPayload) {
-    const path = '/backend/DB/save_recipe.php'; // This is the PHP file you'll create
+// Function to add a new metadata option (e.g., Cuisine, Source) to the database
+async function addNewMetadataOptionEntry(name, tableName) {
+    let path = '/backend/DB/new_metadata_option.php';
 
     try {
         const response = await fetch(path, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json' // Essential to tell PHP you're sending JSON
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'name': name,
+                'table': tableName
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+        }
+
+        const responseJson = await response.json();
+        return responseJson; // This will contain message and the new ID
+    } catch (error) {
+        console.error(`Error adding new ${tableName} option:`, error);
+        throw error;
+    }
+}
+
+// Function to save a new recipe to the database
+async function saveRecipeEntry(recipeDataPayload) {
+    const path = '/backend/DB/save_recipe.php';
+
+    try {
+        const response = await fetch(path, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(recipeDataPayload) // Send the entire recipe object as JSON
         });

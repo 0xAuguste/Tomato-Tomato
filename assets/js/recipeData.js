@@ -4,6 +4,8 @@ class RecipeData {
         this.description = [];
         this.process = [];
         this.ingredients = [];
+        this.yield = ""; // New: Initialize yield
+        this.source = ""; // New: Initialize source
     }
 
     addIngredient(ingredient) {

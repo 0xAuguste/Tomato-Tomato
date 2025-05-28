@@ -20,7 +20,7 @@
 	
 	<div id="recipe-body">
 		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';" autocomplete="off">
-		
+
 		<h4 class="section-label">Recipe Description</h4>
 		<div name="recipe-description" id="recipe-description" class="user-input text-entry" onclick="textBoxClick(event, this)">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
@@ -31,6 +31,59 @@
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
 		</div>
 		<p id="shift-note"><b>Shift + Return</b> to add an ingredient</p>
+
+		<div id="recipe-metadata-bottom">
+            <div class="metadata-field user-input">
+                <div class="section-label">Yield</div>
+                <input type="text" id="recipe-yield-input" class="user-input" placeholder="e.g., 4 servings">
+            </div>
+            <div class="metadata-field user-input">
+                <div class="section-label">Source</div>
+                <div class="dropdown-container">
+                    <input type="text" id="recipe-source-input" class="dropdown-input" onkeyup="optionFilter(this, 'source')" onfocus="showDropdown(this, 'source', false)" onblur="hideDropdown(this)">
+                    <input type="hidden" id="recipe-source-id">
+                    <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
+                </div>
+            </div>
+			<div class="metadata-field user-input">
+                <div class="section-label">Cuisine</div>
+                <div class="dropdown-container">
+                    <input type="text" id="recipe-cuisine-input" class="dropdown-input" onkeyup="optionFilter(this, 'cuisine')" onfocus="showDropdown(this, 'cuisine', false)" onblur="hideDropdown(this)" placeholder="e.g., Italian">
+                    <input type="hidden" id="recipe-cuisine-id">
+                    <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
+                </div>
+            </div>
+            <div class="metadata-field user-input">
+                <div class="section-label" onclick="document.getElementById('recipe-season-input').focus()">Season</div>
+                <div class="dropdown-container">
+                    <input type="text" id="recipe-season-input" class="dropdown-input" readonly
+                        onfocus="showDropdown(this, 'season', true)"
+                        onblur="hideDropdown(this)" placeholder="Select Season">
+                    <input type="hidden" id="recipe-season-id">
+                    <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
+                </div>
+            </div>
+            <div class="metadata-field user-input">
+                <div class="section-label" onclick="document.getElementById('recipe-type-input').focus()">Type</div>
+                <div class="dropdown-container">
+                    <input type="text" id="recipe-type-input" class="dropdown-input" readonly
+                        onfocus="showDropdown(this, 'type', true)"
+                        onblur="hideDropdown(this)" placeholder="Select Type">
+                    <input type="hidden" id="recipe-type-id">
+                    <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
+                </div>
+            </div>
+            <div class="metadata-field user-input">
+                <div class="section-label" onclick="document.getElementById('recipe-meal-input').focus()">Meal</div>
+                <div class="dropdown-container">
+                    <input type="text" id="recipe-meal-input" class="dropdown-input" readonly
+                        onfocus="showDropdown(this, 'meal', true)"
+                        onblur="hideDropdown(this)" placeholder="Select Meal">
+                    <input type="hidden" id="recipe-meal-id">
+                    <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
+                </div>
+            </div>
+        </div>
 	</div>
 	<button type="button" id="save-recipe-button" onclick="saveRecipe()">Save Recipe</button>
 
@@ -41,22 +94,39 @@
 			<div class="ingredient-panel">
 				<div class="add-ingred-field">
 					<label for="add-ingred-quantity">Quantity</label>
-					<input type="text" name="add-ingred-quantity" id="add-ingred-quantity">
+					<input type="text" name="add-ingred-quantity" id="add-ingred-quantity" autocomplete="off">
 				</div>
-				<div class="add-ingred-field">
-					<label for="add-ingred-unit">Unit</label>
-					<select name="add-ingred-unit" id="add-ingred-unit"></select>
+				
+				<div class="add-ingred-field dropdown-container">
+					<label for="add-ingred-unit-input">Unit</label>
+					<input type="text" id="add-ingred-unit-input" class="dropdown-input" autocomplete="off"
+						onkeyup="optionFilter(this, 'unit')"
+						onfocus="showDropdown(this, 'unit', true)"
+						onblur="hideDropdown(this)">
+					<input type="hidden" id="add-ingred-unit-id">
+					<div class="dropdown-list-container">
+						<ul id="add-ingred-unit-list" class="dropdown-list"></ul>
+					</div>
 				</div>
-				<div class="add-ingred-field">
-					<label for="add-ingred-name">Ingredient</label>
-					<select name="add-ingred-name" id="add-ingred-name"></select>
+
+				<div class="add-ingred-field dropdown-container">
+					<label for="add-ingred-name-input">Ingredient</label>
+					<input type="text" id="add-ingred-name-input" class="dropdown-input" autocomplete="off"
+						onkeyup="optionFilter(this, 'ingredient')"
+						onfocus="showDropdown(this, 'ingredient', false)"
+						onblur="hideDropdown(this)">
+					<input type="hidden" id="add-ingred-name-id">
+					<div class="dropdown-list-container">
+						<ul id="add-ingred-name-list" class="dropdown-list"></ul>
+					</div>
 				</div>
+
 				<div class="add-ingred-field">
 					<label for="add-ingred-display">Display Text</label>
 					<input type="text" name="add-ingred-display" id="add-ingred-display" autocomplete="off">
 				</div>
-				<button type="submit" name="save" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
 			</div>
+			<button type="submit" name="save" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
 		</div>
 	</div>
 
