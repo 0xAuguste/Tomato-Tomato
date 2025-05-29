@@ -450,15 +450,26 @@ function displayMessage(message, type = 'info') {
     }, 3000);
 }
 
-// Function to load all dropdown options into caches on page load
+// Function to load all dropdown options into caches and alphabetize on page load
 async function loadDropdownOptions() {
     ingredientOptions = await getTableRows('ingredient');
+    ingredientOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+
     unitOptions = await getTableRows('unit');
+    unitOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+
     cuisineOptions = await getTableRows('cuisine');
+    cuisineOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+
     seasonOptions = await getTableRows('season');
+
     typeOptions = await getTableRows('type');
+    typeOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+
     mealOptions = await getTableRows('meal');
+
     sourceOptions = await getTableRows('source');
+    sourceOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
 }
 
 // Event handler for adding new metadata options

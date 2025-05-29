@@ -19,23 +19,24 @@
 	?>
 	
 	<div id="recipe-body">
-		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" onkeypress="this.style.width = ((this.value.length)) + 'rem';" autocomplete="off">
+		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" autocomplete="off">
 
-		<h4 class="section-label">Recipe Description</h4>
+		<h4 class="section-label">Description</h4>
 		<div name="recipe-description" id="recipe-description" class="user-input text-entry" onclick="textBoxClick(event, this)">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
 		</div>
 		
-		<h4 class="section-label">Recipe Process</h4>
+		<h4 class="section-label">Process</h4>
 		<div name="recipe-process" id="recipe-process" class="user-input text-entry" onclick="textBoxClick(event, this)">
 			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
 		</div>
 		<p id="shift-note"><b>Shift + Return</b> to add an ingredient</p>
 
+		<h4 class="section-label">Other Optional Info</h4>
 		<div id="recipe-metadata-bottom">
             <div class="metadata-field user-input">
                 <div class="section-label">Yield</div>
-                <input type="text" id="recipe-yield-input" class="user-input" placeholder="e.g., 4 servings">
+                <input type="text" id="recipe-yield-input" class="user-input">
             </div>
             <div class="metadata-field user-input">
                 <div class="section-label">Source</div>
@@ -48,7 +49,7 @@
 			<div class="metadata-field user-input">
                 <div class="section-label">Cuisine</div>
                 <div class="dropdown-container">
-                    <input type="text" id="recipe-cuisine-input" class="dropdown-input" onkeyup="optionFilter(this, 'cuisine')" onfocus="showDropdown(this, 'cuisine', false)" onblur="hideDropdown(this)" placeholder="e.g., Italian">
+                    <input type="text" id="recipe-cuisine-input" class="dropdown-input" onkeyup="optionFilter(this, 'cuisine')" onfocus="showDropdown(this, 'cuisine', false)" onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-cuisine-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>
@@ -58,7 +59,7 @@
                 <div class="dropdown-container">
                     <input type="text" id="recipe-season-input" class="dropdown-input" readonly
                         onfocus="showDropdown(this, 'season', true)"
-                        onblur="hideDropdown(this)" placeholder="Select Season">
+                        onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-season-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>
@@ -68,7 +69,7 @@
                 <div class="dropdown-container">
                     <input type="text" id="recipe-type-input" class="dropdown-input" readonly
                         onfocus="showDropdown(this, 'type', true)"
-                        onblur="hideDropdown(this)" placeholder="Select Type">
+                        onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-type-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>
@@ -78,7 +79,7 @@
                 <div class="dropdown-container">
                     <input type="text" id="recipe-meal-input" class="dropdown-input" readonly
                         onfocus="showDropdown(this, 'meal', true)"
-                        onblur="hideDropdown(this)" placeholder="Select Meal">
+                        onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-meal-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>

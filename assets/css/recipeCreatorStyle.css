@@ -10,6 +10,7 @@
     --cream: rgb(249, 246, 238);
     --offwhite: #fffdf8;
     --chalkboard: #58524b;
+    --chalkboard-light: #8d8179;
     --stucco: #f5e1bd;
     --light-fava: #adb57e;
     --dark-fava: #757e39;
@@ -74,17 +75,13 @@ a {
     border-radius: 8px;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.08);
     position: relative;
-    /* Subtle paper texture */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="2" height="2" fill="rgba(0,0,0,0.01)"/><rect x="2" y="2" width="2" height="2" fill="rgba(0,0,0,0.02)"/></svg>');
-    background-blend-mode: multiply;
-    /* border: 8px solid var(--window-trim); */
 }
 
 #recipe-title {
     display: block;
     margin: 0 auto 3rem;
-    min-width: fit-content;
-    max-width: 100%;
+    /* min-width: fit-content; */
+    width: 90%;
     font-size: 2.5rem;
     font-style: italic;
     font-weight: 700;
@@ -92,13 +89,11 @@ a {
     background: none;
     border: none;
     color: var(--chalkboard);
-    /* border-bottom: 2px solid var(--morel); */
     outline: none;
-    box-shadow: 0 15px 30px -30px rgba(0,0,0,0.3);
 }
 
 #recipe-title::placeholder {
-    color: var(--gray-out);
+    color: var(--chalkboard-light);
 }
 
 .section-label {
@@ -120,9 +115,10 @@ a {
 }
 .text-entry {
     border-radius: 5px;
-    background-color: var(--offwhite);
+    background-color: var(--cream);
     transition: outline 0.3s ease, background-color 0.3s;
-    outline: 0px solid white;
+    outline: 2px solid var(--light-fava);
+    cursor: text;
 }
 .text-entry:focus-within {
     outline: 4px solid var(--light-fava);
@@ -231,9 +227,7 @@ input:focus {
 
 .ingredient-panel-content button {
     display: block;
-    flex-basis: 100%; /* Forces the button to wrap to a new line */
-    max-width: 280px; /* Adjust this value to your desired maximum width for the button */
-    margin: 20px auto 0 auto; /* Centers the button horizontally and adds top margin */
+    margin: 20px auto 0 auto;
     padding: 8px 15px;
     background-color: var(--light-fava);
     color: #fffdf8;
@@ -345,12 +339,13 @@ input:focus {
 }
 
 #shift-note {
-    float: right;
+    display: block;
     font-size: 0.8rem;
     font-family: 'Poppins', sans-serif;
     color: var(--gray-out);
     position: relative;
-    margin: 5px 1rem 2rem;
+    text-align: right;
+    margin: 5px 1rem 3rem;
     font-weight: 500;
 }
 #save-recipe-button {
@@ -375,15 +370,6 @@ input:focus {
     box-shadow: 0 8px 20px rgba(0,0,0,0.22);
 }
 
-/* New: Styles for the top metadata section (Source, Yield) */
-#recipe-metadata-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 4rem;
-    flex-wrap: wrap;
-}
-
 /* New: General styling for individual metadata input/select fields */
 .metadata-field {
     flex: 1;
@@ -404,7 +390,7 @@ input:focus {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 20px;
-    margin-top: 5rem;
+    margin-top: 0;
     background-color: var(--cream);
     padding: 30px 10px;
     border-radius: 5px;
@@ -418,14 +404,13 @@ input:focus {
     padding: 8px;
     width: 100%;
     box-sizing: border-box;
-    font-size: 1em;
-    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    font-family: 'EB Garamond', serif;
     background-color: var(--offwhite);
     color: var(--chalkboard);
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
 }
 
-#recipe-metadata-top .user-input,
 #recipe-metadata-bottom .user-input {
     padding: 8px;
     margin: 0;
@@ -464,8 +449,8 @@ input:focus {
 .dropdown-option {
     padding: 10px 15px;
     cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1em;
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1rem;
     color: var(--chalkboard);
 }
 
