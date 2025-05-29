@@ -219,7 +219,6 @@ function showDropdown(inputElem, tableName, showAllOnFocus) {
     listContainer.style.display = 'block'; // Show the dropdown list
 }
 
-
 // Hides the dropdown list when input loses focus
 function hideDropdown(inputElem) {
     // A small delay allows the click event on the list item to register
@@ -227,7 +226,6 @@ function hideDropdown(inputElem) {
         inputElem.nextElementSibling.nextElementSibling.style.display = 'none';
     }, 150);
 }
-
 
 // Helper function to convert an all lowercase word to a capitalized first letter
 function capitalize(word) {
@@ -360,9 +358,9 @@ async function saveRecipe() {
     // Parse Description and Process from the DOM into recipeData object
     recipeData.parseDescription(); // Populates recipeData.description
     recipeData.parseProcess();     // Populates recipeData.process
-
-    // Get Source and Yield
-    recipeData.source = document.getElementById('recipe-source-input').value;
+    
+    // Get metadata
+    recipeData.source = document.getElementById('recipe-source-id').value;
     recipeData.yield = document.getElementById('recipe-yield-input').value;
     recipeData.cuisine = document.getElementById('recipe-cuisine-id').value;
     recipeData.season = document.getElementById('recipe-season-id').value;
@@ -375,16 +373,17 @@ async function saveRecipe() {
         description: JSON.stringify(recipeData.description),
         process: JSON.stringify(recipeData.process),
         ingredients: JSON.stringify(recipeData.ingredients), // This will contain frontend IDs and DB IDs
-        source: recipeData.source,
-        yield: recipeData.yield,
-        cuisine: recipeData.cuisine,
-        season: recipeData.season,
-        type: recipeData.type,
-        meal: recipeData.meal
+        ...(recipeData.source.length > 0 ? { sourceID: recipeData.source} : {}),
+        ...(recipeData.yield.length > 0 ? { yield: recipeData.yield} : {}),
+        ...(recipeData.cuisine.length > 0 ? { cuisineID: recipeData.cuisine} : {}),
+        ...(recipeData.season.length > 0 ? { seasonID: recipeData.season} : {}),
+        ...(recipeData.meal.length > 0 ? { mealID: recipeData.meal} : {}),
+        ...(recipeData.type.length > 0 ? { typeID: recipeData.type} : {}),
     };
 
     // Send data to PHP backend using the helper function from db-handler.js
     try {
+        console.log(recipePayload);
         const response = await saveRecipeEntry(recipePayload); // send data to backend
         console.log(response);
         displayMessage(response.message, 'success');

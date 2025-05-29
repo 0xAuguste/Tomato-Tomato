@@ -41,7 +41,7 @@
             <div class="metadata-field user-input">
                 <div class="section-label">Source</div>
                 <div class="dropdown-container">
-                    <input type="text" id="recipe-source-input" class="dropdown-input" onkeyup="optionFilter(this, 'source')" onfocus="showDropdown(this, 'source', false)" onblur="hideDropdown(this)">
+                    <input type="text" id="recipe-source-input" class="dropdown-input" onkeyup="optionFilter(this, 'source')" onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-source-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>
@@ -49,7 +49,7 @@
 			<div class="metadata-field user-input">
                 <div class="section-label">Cuisine</div>
                 <div class="dropdown-container">
-                    <input type="text" id="recipe-cuisine-input" class="dropdown-input" onkeyup="optionFilter(this, 'cuisine')" onfocus="showDropdown(this, 'cuisine', false)" onblur="hideDropdown(this)">
+                    <input type="text" id="recipe-cuisine-input" class="dropdown-input" onkeyup="optionFilter(this, 'cuisine')" onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-cuisine-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>
