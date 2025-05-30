@@ -4,6 +4,12 @@ class RecipeData {
         this.description = [];
         this.process = [];
         this.ingredients = [];
+        this.yield = "";
+        this.source = "";
+        this.cuisine = "";
+        this.meal = "";
+        this.season = "";
+        this.type = "";
     }
 
     addIngredient(ingredient) {
@@ -70,12 +76,13 @@ class RecipeData {
 }
 
 class Ingredient {
-    constructor(id, name, quantity, unit, ingredientDbId, unitDbId) {
+    constructor(id, name, ingredientDbId, quantity, unit, unitDbId, displayText) {
         this.id = id; // Frontend unique ID (Date.now())
         this.name = name; // Display name
         this.quantity = quantity;
         this.unit = unit; // Display unit
         this.ingredientDbId = ingredientDbId; // Actual database ID for the ingredient
         this.unitDbId = unitDbId;           // Actual database ID for the unit
+        this.displayText = displayText;
     }
 }
