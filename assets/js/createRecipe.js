@@ -310,7 +310,7 @@ function saveAddIngredient() {
 
 
     // Initialize ingredient object
-    let ingredient = new Ingredient(id, name, quantity, unit, ingredientDbId, unitDbId);
+    let ingredient = new Ingredient(id, name, ingredientDbId, quantity, unit, unitDbId, displayText);
     recipeData.addIngredient(ingredient);
 
     ingredientText.id = id; // Set the ID on the span after validation

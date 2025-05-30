@@ -31,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $recipeName = $input['name'];
     $recipeDescription = $input['description'];
     $recipeProcess = $input['process'];
-    $recipeIngredients = $input['ingredients'];
+    $recipeIngredients = json_decode($input['ingredients'], true);
+    // var_dump($recipeIngredients);
 
     $recipeYield = isset($input['yield']) ? $input['yield'] : null;
     $sourceID = isset($input['sourceID']) ? $input['sourceID'] : null;
@@ -60,45 +61,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $newRecipeID = generate_uuid_v4();
 
         // Prepare the INSERT statement for the recipe table
-        $sql_recipe = "INSERT INTO recipe (id, name, description, process, sourceID, yield) VALUES (:id, :name, :description, :process, :sourceID, :yield)";
+        $sql_recipe = "INSERT INTO recipe (id, name, description, process, yield) VALUES (:id, :name, :description, :process, :yield)";
         $stmt_recipe = $pdo->prepare($sql_recipe);
 
         // Bind parameters for recipe table
         $stmt_recipe->bindParam(':id', $newRecipeID);
         $stmt_recipe->bindParam(':name', $recipeName);
-        $stmt_recipe->bindParam(':description', $recipeDescription); // Store as JSON string
-        $stmt_recipe->bindParam(':process', $recipeProcess);       // Store as JSON string
-        $stmt_recipe->bindParam(':sourceID', $sourceID);
+        $stmt_recipe->bindParam(':description', $recipeDescription);
+        $stmt_recipe->bindParam(':process', $recipeProcess);
         $stmt_recipe->bindParam(':yield', $recipeYield);
         $stmt_recipe->execute();
 
         // Prepare the INSERT statement for recipe_ingredients table
-        $sql_recipe_ingredient = "INSERT INTO recipe_ingredients (id, recipeID, ingredientID, volume, volUnit, mass, massUnit, displayText) VALUES (:id, :recipeID, :ingredientID, :volume, :volUnit, :mass, :massUnit, :displayText)";
+        $sql_recipe_ingredient = "INSERT INTO recipe_ingredients (id, recipeID, ingredientID, quantity, unitID, displayText) VALUES (:id, :recipeID, :ingredientID, :quantity, :unitID, :displayText)";
         $stmt_recipe_ingredient = $pdo->prepare($sql_recipe_ingredient);
 
         // Insert ingredients
         foreach ($recipeIngredients as $ingredient) {
             if (isset($ingredient['ingredientDbId'])) {
-                $ingredID = generate_uuid_v4();
-                $vol = isset($ingredient['quantity']) ? $ingredient['quantity'] : null; // 'quantity' from frontend maps to 'volume'
-                $volUnitDbId = isset($ingredient['unitDbId']) ? $ingredient['unitDbId'] : null; // Store unit ID
-                $mass = null; // Assuming mass is not directly provided in this structure
-                $massUnitDbId = null; // Assuming massUnit is not directly provided
-                $displayText = $ingredient['display']; // Store the display text
+                $recipeIngredID = generate_uuid_v4();
+                $quantity = isset($ingredient['quantity']) ? $ingredient['quantity'] : null;
+                $unitDbId = isset($ingredient['unitDbId']) ? $ingredient['unitDbId'] : null;
+                $displayText = $ingredient['displayText'];
 
-                $stmt_recipe_ingredient->bindParam(':id', $ingredID);
+                $stmt_recipe_ingredient->bindParam(':id', $recipeIngredID);
                 $stmt_recipe_ingredient->bindParam(':recipeID', $newRecipeID);
                 $stmt_recipe_ingredient->bindParam(':ingredientID', $ingredient['ingredientDbId']);
-                $stmt_recipe_ingredient->bindParam(':volume', $vol);
-                $stmt_recipe_ingredient->bindParam(':volUnit', $volUnitDbId);
-                $stmt_recipe_ingredient->bindParam(':mass', $mass);
-                $stmt_recipe_ingredient->bindParam(':massUnit', $massUnitDbId);
+                $stmt_recipe_ingredient->bindParam(':quantity', $quantity);
+                $stmt_recipe_ingredient->bindParam(':unitID', $unitDbId);
                 $stmt_recipe_ingredient->bindParam(':displayText', $displayText);
 
                 $stmt_recipe_ingredient->execute();
             } else {
                 error_log("Ingredient missing database ID for recipe ID: {$newRecipeID}. Frontend ID was '{$ingredient['id']}'. Skipping this ingredient for recipe_ingredients table.");
             }
+        }
+
+        // Insert into recipe_cuisines
+        if ($sourceID) {
+            $sql_recipe_source = "INSERT INTO recipe_sources (id, recipeID, sourceID) VALUES (:id, :recipeID, :sourceID)";
+            $stmt_recipe_source = $pdo->prepare($sql_recipe_source);
+            $recipeSourceID = generate_uuid_v4();
+            $stmt_recipe_source->bindParam(':id', $recipeSourceID);
+            $stmt_recipe_source->bindParam(':recipeID', $newRecipeID);
+            $stmt_recipe_source->bindParam(':sourceID', $sourceID);
+            $stmt_recipe_source->execute();
         }
 
         // Insert into recipe_cuisines
