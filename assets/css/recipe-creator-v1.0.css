@@ -1,72 +1,3 @@
-@font-face {
-    font-family: wobbly;
-    src: url(fonts/Mase-vnv19.otf);
-}
-@font-face {
-    font-family: stamp;
-    src: url(fonts/LoficottagefreeRegular-BW4O8.otf);
-}
-:root {
-    --cream: rgb(249, 246, 238);
-    --offwhite: #fffdf8;
-    --chalkboard: #58524b;
-    --chalkboard-light: #8d8179;
-    --stucco: #f5e1bd;
-    --light-fava: #adb57e;
-    --dark-fava: #757e39;
-    --yellow-wall: #edbd5f;
-    --aix-wall: #fad695;
-    --aix-wall-light: #f8e4c1;
-    --sunflower: #ffe5a5;
-    --window-trim: #e38c4c;
-    --aix-door: #eee7e0;
-    --whey: #efebdf;
-    --gray-out: #a8a297;
-}
-body {
-    background-color: var(--stucco);
-    font-family: 'EB Garamond', serif;
-    font-size: 1.1em;
-    margin: 0;
-    color: var(--chalkboard);
-}
-a {
-	text-decoration:none;
-}
-#header {
-    position: relative;
-    margin: 0;
-    width: 100%;
-    height: 4rem;
-    padding-top: 2rem;
-}
-#home-button {
-    float: left;
-    margin-left: 3rem;
-    font-size: 1.8rem;
-    font-family: wobbly;
-}
-#left-tomato {
-    color: tomato;
-}
-#right-tomato {
-    color: rgb(254, 125, 33);
-}
-#nav-bar {
-    float: right;
-    margin-right: 3rem;
-    font-size: 1.1rem;
-}
-#nav-bar a {
-    margin: 0.5rem 1rem;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--chalkboard);
-}
-#nav-bar a:hover {
-    color: var(--dark-fava);
-}
 #recipe-body {
     margin: 3rem auto 2rem;
     width: min(55%, 800px);
@@ -171,11 +102,6 @@ input:focus {
     /* Subtle aged paper background texture */
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="2" height="2" fill="rgba(0,0,0,0.01)"/><rect x="2" y="2" width="2" height="2" fill="rgba(0,0,0,0.01)"/></svg>');
     background-blend-mode: multiply;
-}
-
-@keyframes animatetop {
-    from {top: -300px; opacity: 0}
-    to {top: 0; opacity: 1}
 }
 
 .ingredient-panel {
@@ -373,7 +299,6 @@ input:focus {
     box-shadow: 0 8px 20px rgba(0,0,0,0.22);
 }
 
-/* New: General styling for individual metadata input/select fields */
 .metadata-field {
     flex: 1;
     min-width: 150px;
@@ -382,13 +307,11 @@ input:focus {
     margin-bottom: 10px;
 }
 
-/* New: Adjusts label spacing within metadata fields */
 .metadata-field .section-label {
     margin-bottom: 5px;
     margin-left: 0;
 }
 
-/* New: Styles for the bottom metadata section (Cuisine, Season, Type, Meal) */
 #recipe-metadata-bottom {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -399,9 +322,8 @@ input:focus {
     border-radius: 5px;
 }
 
-/* New: Consistent styling for inputs and selects within the new metadata sections */
 #recipe-metadata-bottom input,
-#recipe-metadata-bottom .dropdown-input { /* Updated to target dropdown-input for bottom metadata */
+#recipe-metadata-bottom .dropdown-input {
     border: none;
     border-radius: 5px;
     padding: 8px;
@@ -419,9 +341,8 @@ input:focus {
     margin: 0;
 }
 
-/* New: Styles for the searchable dropdown containers */
 .dropdown-container {
-    position: relative; /* Essential for positioning the dropdown list */
+    position: relative;
 }
 
 .dropdown-input:focus {

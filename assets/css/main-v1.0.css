@@ -1,0 +1,74 @@
+@font-face {
+    font-family: wobbly;
+    src: url(fonts/Mase-vnv19.otf);
+}
+@font-face {
+    font-family: stamp;
+    src: url(fonts/LoficottagefreeRegular-BW4O8.otf);
+}
+:root {
+    --cream: rgb(249, 246, 238);
+    --offwhite: #fffdf8;
+    --chalkboard: #58524b;
+    --chalkboard-light: #8d8179;
+    --stucco: #f5e1bd;
+    --light-fava: #adb57e;
+    --dark-fava: #757e39;
+    --yellow-wall: #edbd5f;
+    --aix-wall: #fad695;
+    --aix-wall-light: #f8e4c1;
+    --sunflower: #ffe5a5;
+    --window-trim: #e38c4c;
+    --aix-door: #eee7e0;
+    --whey: #efebdf;
+    --gray-out: #a8a297;
+}
+body {
+    background-color: var(--stucco);
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1em;
+    margin: 0;
+    color: var(--chalkboard);
+}
+a {
+	text-decoration:none;
+}
+#header {
+    position: relative;
+    margin: 0;
+    width: 100%;
+    height: 4rem;
+    padding-top: 2rem;
+}
+#home-button {
+    float: left;
+    margin-left: 3rem;
+    font-size: 1.8rem;
+    font-family: wobbly;
+}
+#left-tomato {
+    color: tomato;
+}
+#right-tomato {
+    color: rgb(254, 125, 33);
+}
+#nav-bar {
+    float: right;
+    margin-right: 3rem;
+    font-size: 1.1rem;
+}
+#nav-bar a {
+    margin: 0.5rem 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--chalkboard);
+}
+#nav-bar a:hover {
+    color: var(--dark-fava);
+}
+
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
