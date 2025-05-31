@@ -72,3 +72,30 @@ a {
     from {top: -300px; opacity: 0}
     to {top: 0; opacity: 1}
 }
+
+#recipe-body {
+    width: min(55%, 800px);
+    position: relative;
+    /* border: 1px solid black; */
+}
+#recipe-title {
+    display: block;
+    margin: 0 auto 3rem;
+    width: 90%;
+    font-size: 2.5rem;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--chalkboard);
+    text-align: center;
+    /* border: 1px solid black; */
+}
+.section-label {
+    font-family: Poppins;
+    margin: 0 0 0.7rem 0.3rem;;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.section-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+}

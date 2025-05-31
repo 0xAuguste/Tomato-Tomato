@@ -95,3 +95,22 @@ async function saveRecipeEntry(recipeDataPayload) {
         throw error;
     }
 }
+
+// Function to grab a recipe from the database given an ID
+async function getRecipeById(recipeId) {
+    const path = `/backend/DB/get_recipe.php?id=${recipeId}`;
+
+    try {
+        const response = await fetch(path);
+        if (!response.ok) {
+            // If the response is not OK, parse the error message from the PHP script
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+        const recipeData = await response.json();
+        return recipeData;
+    } catch (error) {
+        console.error("Error fetching recipe by ID:", error);
+        throw error; // Re-throw to be handled by the calling function
+    }
+}

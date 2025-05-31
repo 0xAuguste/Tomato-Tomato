@@ -1,41 +1,30 @@
+/* Styling for createrecipe page */
+
+input, button {
+    font-family: inherit;
+    text-align: center;
+}
+input:focus {
+    outline: 2px solid var(--window-trim);
+}
 #recipe-body {
-    margin: 3rem auto 2rem;
-    width: min(55%, 800px);
-    padding: 3rem min(5%, 5rem);
     background-color: var(--aix-door);
     border-radius: 8px;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.08);
-    position: relative;
+    margin: 3rem auto 2rem;
+    padding: 3rem min(5%, 5rem);
 }
 
 #recipe-title {
-    display: block;
-    margin: 0 auto 3rem;
-    /* min-width: fit-content; */
-    width: 90%;
-    font-size: 2.5rem;
-    font-style: italic;
-    font-weight: 700;
-    padding: 1rem;
     background: none;
     border: none;
-    color: var(--chalkboard);
     outline: none;
+    font-size: 2.5rem;
+    padding: 1rem 0;
 }
 
 #recipe-title::placeholder {
     color: var(--chalkboard-light);
-}
-
-.section-label {
-    font-family: Poppins;
-    margin: 0 0 0.7rem 0.3rem;;
-    font-size: 1rem;
-    font-weight: 600;
-}
-.section-header {
-    font-size: 1.5rem;
-    font-weight: 600;
 }
 #recipe-description {
     min-height: 50px;
@@ -65,13 +54,6 @@
 }
 .recipe-paragraph:focus {
     outline: none;
-}
-input, button {
-    font-family: inherit;
-    text-align: center;
-}
-input:focus {
-    outline: 2px solid var(--window-trim);
 }
 #add-ingredient-panel {
     display: none;

@@ -4,12 +4,10 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Recipe</title>
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
-		@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-	</style>
-	<link href="/assets/css/recipeStyle.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
     <link href="/assets/css/main-v1.0.css" type="text/css" rel="stylesheet">
+    <link href="/assets/css/recipe-viewer-v0.1.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<?php
@@ -21,6 +19,18 @@
 	
 	<div id="recipe-body">
 		<h1 name="recipe-title" id="recipe-title"></h1>
+        <div id="recipe-meta-data">
+            <p id="recipe-yield"></p>
+            <p id="recipe-source"></p>
+            <p id="recipe-cuisine"></p>
+            <p id="recipe-meal"></p>
+            <p id="recipe-season"></p>
+            <p id="recipe-type"></p>
+        </div>
+        <div id="recipe-ingredients">
+            <h4 class="section-label">Ingredients</h4>
+            <ul id="ingredient-list"></ul>
+        </div>
         <div name="recipe-description" id="recipe-description"></div>
         <div name="recipe-process" id="recipe-process"></div>
 	</div>

@@ -1,0 +1,8 @@
+/* Styling for recipe page */
+
+#recipe-body {
+    margin: 3rem auto 4rem;
+}
+#recipe-title {
+    font-size: 2.7rem;
+}
