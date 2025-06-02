@@ -44,16 +44,12 @@ class RecipeData {
                     const ingredientId = ingredientSpan.id; // Frontend unique ID
                     const ingredientData = this.ingredients.find(ing => ing.id == ingredientId); // Find the full ingredient object
 
+                    // When pushing to the Process, only store frontend id and display text. Rest of data is stored in Ingredients
                     if (ingredientData) {
                         structuredProcess.push({
                             type: 'ingredient',
-                            id: ingredientData.id, // Frontend unique ID
-                            name: ingredientData.name,
-                            quantity: ingredientData.quantity,
-                            unit: ingredientData.unit,
-                            ingredientDbId: ingredientData.ingredientDbId, // Database Ingredient ID
-                            unitDbId: ingredientData.unitDbId, // Database Unit ID
-                            display: ingredientSpan.innerText // Store the display text as well
+                            id: ingredientData.id,
+                            display: ingredientSpan.innerText
                         });
                     }
                 }

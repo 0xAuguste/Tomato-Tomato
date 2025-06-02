@@ -61,7 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $newRecipeID = generate_uuid_v4();
 
         // Prepare the INSERT statement for the recipe table
-        $sql_recipe = "INSERT INTO recipe (id, name, description, process, yield) VALUES (:id, :name, :description, :process, :yield)";
+        $sql_recipe = "INSERT INTO recipe (id, name, description, process, yield) 
+                       VALUES (:id, :name, :description, :process, :yield)";
         $stmt_recipe = $pdo->prepare($sql_recipe);
 
         // Bind parameters for recipe table
@@ -73,23 +74,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt_recipe->execute();
 
         // Prepare the INSERT statement for recipe_ingredients table
-        $sql_recipe_ingredient = "INSERT INTO recipe_ingredients (id, recipeID, ingredientID, quantity, unitID, displayText) VALUES (:id, :recipeID, :ingredientID, :quantity, :unitID, :displayText)";
+        $sql_recipe_ingredient = "INSERT INTO recipe_ingredients (id, recipeID, ingredientID, frontendIngredID, quantity, unitID, displayText)
+                                  VALUES (:id, :recipeID, :ingredientID, :frontendIngredID, :quantity, :unitID, :displayText)";
         $stmt_recipe_ingredient = $pdo->prepare($sql_recipe_ingredient);
 
         // Insert ingredients
         foreach ($recipeIngredients as $ingredient) {
             if (isset($ingredient['ingredientDbId'])) {
                 $recipeIngredID = generate_uuid_v4();
-                $quantity = isset($ingredient['quantity']) ? $ingredient['quantity'] : null;
-                $unitDbId = isset($ingredient['unitDbId']) ? $ingredient['unitDbId'] : null;
-                $displayText = $ingredient['displayText'];
 
                 $stmt_recipe_ingredient->bindParam(':id', $recipeIngredID);
                 $stmt_recipe_ingredient->bindParam(':recipeID', $newRecipeID);
                 $stmt_recipe_ingredient->bindParam(':ingredientID', $ingredient['ingredientDbId']);
-                $stmt_recipe_ingredient->bindParam(':quantity', $quantity);
-                $stmt_recipe_ingredient->bindParam(':unitID', $unitDbId);
-                $stmt_recipe_ingredient->bindParam(':displayText', $displayText);
+                $stmt_recipe_ingredient->bindParam(':frontendIngredID', $ingredient['id']);
+                $stmt_recipe_ingredient->bindParam(':quantity', $ingredient['quantity']);
+                $stmt_recipe_ingredient->bindParam(':unitID', $ingredient['unitDbId']);
+                $stmt_recipe_ingredient->bindParam(':displayText', $ingredient['displayText']);
 
                 $stmt_recipe_ingredient->execute();
             } else {
