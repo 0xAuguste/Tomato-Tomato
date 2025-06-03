@@ -8,7 +8,7 @@
 		@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
 		@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 	</style>
-	<link href="/assets/css/recipeCreatorStyle.css" type="text/css" rel="stylesheet">
+	<link href="/assets/css/recipe-creator-v1.0.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<?php
@@ -127,18 +127,34 @@
 					<input type="text" name="add-ingred-display" id="add-ingred-display" autocomplete="off">
 				</div>
 			</div>
-			<button type="submit" name="save" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
-		</div>
-	</div>
+			<button type="submit" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
 
-	<div id="create-ingredient-panel" style="display: none">
-		<form id="new-ingredient-form">
-			<label for="new-ingred-name">Name</label>
-			<input type="text" name="new-ingred-name" id="new-ingred-name" autocomplete="off" class="new-ingred-form" placeholder="e.g. 'Yellow Onion'">
-			<label for="new-ingred-class">Group</label>
-			<input type="text" name="new-ingred-class" id="new-ingred-class" autocomplete="off" class="new-ingred-form" placeholder="e.g. Onion">
-			<button type="submit" name="save" class="new-ingred-form" onclick="saveNewIngredient(); return false;">Save</button>
-		</form>
+			<div id="create-ingredient-panel" class="ingredient-panel">
+				<div class="add-ingred-field dropdown-container">
+					<label for="create-ingred-name-input">Name</label>
+					<input type="text" id="create-ingred-name-input" class="dropdown-input" autocomplete="off"
+						onkeyup="optionFilter(this, 'ingredient')"
+						onfocus="showDropdown(this, 'ingredient', false)"
+						onblur="hideDropdown(this)">
+					<input type="hidden" id="create-ingred-name-id">
+					<div class="dropdown-list-container">
+						<ul id="create-ingred-name-list" class="dropdown-list"></ul>
+					</div>
+				</div>
+				<div class="add-ingred-field dropdown-container">
+					<label for="create-ingred-class-input">Class</label>
+					<input type="text" id="create-ingred-class-input" class="dropdown-input" autocomplete="off"
+						onkeyup="optionFilter(this, 'ingredientCategory')"
+						onfocus="showDropdown(this, 'ingredientCategory', true)"
+						onblur="hideDropdown(this)">
+					<input type="hidden" id="create-ingred-class-id">
+					<div class="dropdown-list-container">
+						<ul id="create-ingred-class-list" class="dropdown-list"></ul>
+					</div>
+				</div>
+				<button type="submit" id="save-new-ingredient-button" onclick="saveNewIngredientToDB()">Save Ingredient To Database</button>
+			</div>
+		</div>
 	</div>
 
 	<script src="/assets/js/db-handler.js"></script>
