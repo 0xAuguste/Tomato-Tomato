@@ -1,6 +1,11 @@
 <?php
+
+// Require the UUID helper function
+require_once(__DIR__ . '/../utils/uuid.php');
+
 header('Content-Type: application/json');
 header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Origin: *"); // Ensure CORS is enabled for development
 
 // Check that we received an ingredient via POST and assign variables
 $input = json_decode(file_get_contents('php://input'), true);
@@ -18,6 +23,8 @@ else {
 try {
     require_once('databaseKeys.php');
     $pdo = new PDO(DB_DSN, DB_USER, DB_PASSWORD);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Enable exceptions for better error handling
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC); // Fetch as associative array by default
 
 }
 catch (PDOException $e) {
@@ -33,21 +40,33 @@ try {
     $sth->bindValue(':ingred_category', $ingred_category);
     $sth->execute();
 
-    $categoryID = $sth->fetch()[0]; // extract the category ID
+    $categoryData = $sth->fetch(); // Fetch the associative array
+    $categoryID = $categoryData ? $categoryData['id'] : null; // Extract the category ID, or null if not found
 
     // Insert the ingredient name and categoryID into `ingredients`
     if ($categoryID) {
-        $sql_insert = "INSERT INTO ingredient (name, categoryID) VALUES (:ingred_name, :category_ID)";
+        $newId = generate_uuid_v4(); // Generate a new UUID in PHP
+
+        $sql_insert = "INSERT INTO ingredient (id, name, categoryID) VALUES (:id, :ingred_name, :category_ID)";
         $sth = $pdo->prepare($sql_insert);
+        $sth->bindValue(':id', $newId); // Bind the generated UUID
         $sth->bindValue(':ingred_name', $ingred_name);
         $sth->bindValue(':category_ID', $categoryID);
         $sth->execute();
-        echo json_encode(["message" => "New ingredient '$ingred_name' successfully added"]);
+
+        echo json_encode([
+            "message" => "New ingredient '" . $ingred_name . "' successfully added",
+            "id" => $newId, // Return the newly generated UUID
+            "name" => $ingred_name // Return the name for convenience
+        ]);
     } else {
-        echo json_encode(["error" => "Category does not exist."]);
-        exit;
+        http_response_code(404); // Not Found
+        echo json_encode(["error" => "Ingredient category '" . $ingred_category . "' not found."]);
     }
 }
 catch (PDOException $e) {
-    echo json_encode(["error" => "Error executing query: " . $e->getMessage()]);
+    http_response_code(500); // Internal Server Error
+    echo json_encode(["error" => "Error adding new ingredient: " . $e->getMessage()]);
 }
+
+?>
