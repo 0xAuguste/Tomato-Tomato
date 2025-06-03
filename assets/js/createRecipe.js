@@ -9,6 +9,7 @@ let seasonOptions = [];
 let typeOptions = [];
 let mealOptions = [];
 let sourceOptions = [];
+let ingredientCategoryOptions = [];
 
 // Create an event listener on DOMContentLoaded to ensure elements are available
 document.addEventListener('DOMContentLoaded', async () => {
@@ -24,6 +25,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (sourceInput) {
         sourceInput.addEventListener('keydown', (event) => handleMetadataOptionAddition(event, sourceInput, 'source'));
     }
+
+    // Add event listener for Enter key on the ingredient name input in the add-ingredient panel
+    const addIngredNameInput = document.getElementById('add-ingred-name-input');
+    if (addIngredNameInput) {
+        addIngredNameInput.addEventListener('keydown', handleIngredientInputKeydown);
+    }
 });
 
 // FUNCTION DEFINITIONS
@@ -36,6 +43,7 @@ function openAddIngredient() {
 
 // Toggles display of #add-ingredient-panel
 function closeAddIngredient() {
+    closeCreateIngredient();
     var panel = document.getElementById("add-ingredient-panel");
     panel.style.display = "none";
 }
@@ -43,13 +51,29 @@ function closeAddIngredient() {
 // Toggles display of #create-ingredient-panel
 function openCreateIngredient() {
     var panel = document.getElementById("create-ingredient-panel");
-    panel.style.display = "flex";
+    panel.style.display = "flex"; // Make it visible (but still collapsed by CSS max-height: 0)
+    // Use a small timeout to allow the display property to apply before starting the transition
+    setTimeout(() => {
+        panel.style.maxHeight = panel.scrollHeight + "px"; // Expand to full height
+    }, 10); // A very small delay
+
+    // Pre-fill the new ingredient name from the add ingredient input
+    const addIngredNameInput = document.getElementById('add-ingred-name-input');
+    const newIngredNameInput = document.getElementById('create-ingred-name-input');
+    if (addIngredNameInput && newIngredNameInput) {
+        newIngredNameInput.value = addIngredNameInput.value;
+    }
 }
 
 // Toggles display of #create-ingredient-panel
 function closeCreateIngredient() {
     var panel = document.getElementById("create-ingredient-panel");
-    panel.style.display = "none";
+    panel.style.maxHeight = "0"; // Collapse panel
+    panel.style.display = "none"; // Hide panel
+    // Clear the new ingredient form fields
+    document.getElementById('create-ingred-name-input').value = '';
+    document.getElementById('create-ingred-class-input').value = '';
+    document.getElementById('create-ingred-class-id').value = '';
 }
 
 // Main function to handle text entry into recipe body divs
@@ -142,6 +166,7 @@ async function optionFilter(inputElem, tableName) {
         case 'type': optionsToFilter = typeOptions; break;
         case 'meal': optionsToFilter = mealOptions; break;
         case 'source': optionsToFilter = sourceOptions; break;
+        case 'ingredientCategory': options = ingredientCategoryOptions; break;
     }
 
     let filteredOptions = optionsToFilter.filter(row =>
@@ -201,7 +226,10 @@ function showDropdown(inputElem, tableName, showAllOnFocus) {
         case 'type': optionsToDisplay = typeOptions; break;
         case 'meal': optionsToDisplay = mealOptions; break;
         case 'source': optionsToDisplay = sourceOptions; break;
+        case 'ingredientCategory': optionsToDisplay = ingredientCategoryOptions; break;
     }
+
+    console.log(optionsToDisplay);
 
     list.innerHTML = '';
     optionsToDisplay.forEach(row => {
@@ -230,35 +258,6 @@ function hideDropdown(inputElem) {
 // Helper function to convert an all lowercase word to a capitalized first letter
 function capitalize(word) {
     return word.charAt(0).toUpperCase()+ word.slice(1);
-}
-
-// Pushes new ingredient info entered by the user to the database
-async function saveNewIngredient() {
-    let newIngredName = document.getElementById('new-ingred-name').value.trim();
-    let newIngredCategory = document.getElementById('new-ingred-class').value.trim();
-
-    if (!newIngredName) {
-        displayMessage("Please enter a new ingredient name.", 'error');
-        document.getElementById('new-ingred-name').focus();
-        return;
-    }
-    if (!newIngredCategory) {
-        displayMessage("Please enter an ingredient group/category.", 'error');
-        document.getElementById('new-ingred-class').focus();
-        return;
-    }
-
-    try {
-        const response = await addNewIngredientEntry(newIngredName, newIngredCategory);
-        document.getElementById('new-ingredient-form').reset();
-        closeCreateIngredient();
-        displayMessage(response.message || "New ingredient added successfully!", 'success');
-        // Re-populate ingredient/unit dropdowns after new ingredient is added
-        await loadDropdownOptions(); // Re-load all options to update the cache
-    } catch (error) {
-        console.error("Error saving new ingredient:", error);
-        displayMessage("Error saving new ingredient. Check console for details.", 'error');
-    }
 }
 
 // Adds ingredient to the recipe
@@ -469,6 +468,8 @@ async function loadDropdownOptions() {
 
     sourceOptions = await getTableRows('source');
     sourceOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+
+    ingredientCategoryOptions = await getTableRows('ingredientCategory');
 }
 
 // Event handler for adding new metadata options
@@ -542,5 +543,74 @@ async function handleMetadataOptionAddition(event, inputElem, tableName) {
                 displayMessage(`Error adding new ${tableName} option.`, 'error');
             }
         }
+    }
+}
+
+// Function to handle keydown events on the ingredient name input in the add-ingredient panel
+async function handleIngredientInputKeydown(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent default form submission
+
+        const inputElem = event.target;
+        const inputValue = inputElem.value.trim();
+
+        // Check if the ingredient exists in the current options
+        const ingredientExists = ingredientOptions.some(option => option.name.toLowerCase() === inputValue.toLowerCase());
+
+        if (inputValue && !ingredientExists) {
+            // If the ingredient doesn't exist, open the create ingredient panel
+            openCreateIngredient();
+        } else if (inputValue && ingredientExists) {
+            // If it exists, select it and close the dropdown
+            const selectedOption = ingredientOptions.find(option => option.name.toLowerCase() === inputValue.toLowerCase());
+            if (selectedOption) {
+                inputElem.value = selectedOption.name;
+                document.getElementById('add-ingred-name-id').value = selectedOption.id;
+                hideDropdown(inputElem); // Hide the dropdown
+            }
+        } else {
+            // Optionally, handle empty input or other cases
+            displayMessage('Please enter an ingredient name.', 'info');
+        }
+    }
+}
+
+// Function to save a new ingredient to the database from the create-ingredient panel
+async function saveNewIngredientToDB() {
+    const newIngredNameInput = document.getElementById('create-ingred-name-input');
+    const newIngredCategoryInput = document.getElementById('create-ingred-class-input');
+    const newIngredCategoryHiddenInput = document.getElementById('create-ingred-class-id');
+
+    const newIngredName = newIngredNameInput.value.trim();
+    const newIngredCategoryName = newIngredCategoryInput.value.trim();
+    const newIngredCategoryId = newIngredCategoryHiddenInput.value; // This will be the ID from the dropdown selection
+
+    if (!newIngredName) {
+        displayMessage('Please enter a name for the new ingredient.', 'error');
+        return;
+    }
+    if (!newIngredCategoryName || !newIngredCategoryId) {
+        displayMessage('Please select or create a category for the new ingredient.', 'error');
+        return;
+    }
+
+    try {
+        const response = await addNewIngredientEntry(newIngredName, newIngredCategoryName);
+
+        if (response && response.id) {
+            displayMessage(`Ingredient "${response.name}" added successfully!`, 'success');
+            // Update the main ingredient input with the newly created ingredient
+            document.getElementById('add-ingred-name-input').value = response.name;
+            document.getElementById('add-ingred-name-id').value = response.id;
+
+            closeCreateIngredient(); // Close the create ingredient panel
+            await loadDropdownOptions(); // Reload all options, including the new ingredient
+            // The add-ingred-name-input is already set, so no need to re-filter/re-select.
+        } else {
+            displayMessage(response.error || 'Failed to add new ingredient.', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving new ingredient to DB:', error);
+        displayMessage(`Error saving new ingredient: ${error.message}`, 'error');
     }
 }

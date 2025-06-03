@@ -182,71 +182,18 @@ input:focus {
 }
 
 #create-ingredient-panel {
-    display: none;
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.15);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#create-ingredient-panel form {
     background-color: #FCFBF7;
-    padding: 30px;
-    width: 80%;
-    max-width: 400px;
+    padding: 20px;
+    width: 90%;
     border-radius: 10px;
     box-shadow: 0 6px 15px 0 rgba(0,0,0,0.15);
     position: relative;
     border: 1px solid #B0A080;
-    /* Subtle aged paper background texture */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="2" height="2" fill="rgba(0,0,0,0.01)"/><rect x="2" y="2" width="2" height="2" fill="rgba(0,0,0,0.01)"/></svg>');
-    background-blend-mode: multiply;
-}
-
-#create-ingredient-panel label {
-    font-family: 'Poppins', sans-serif;
-    color: var(--dark-fava);
-    font-weight: 500;
-    font-size: 0.9em;
-    margin-bottom: -10px;
-}
-
-#create-ingredient-panel input[type="text"] {
-    border: 1px solid var(--light-fava);
-    border-radius: 5px;
-    padding: 8px;
-    font-family: 'Poppins', sans-serif;
-    background-color: #FEFDFC;
-    color: #4A4A4A;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-}
-
-#create-ingredient-panel button[type="submit"] {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: var(--light-fava);
-    color: var(--offwhite);
-    font-family: 'Poppins', sans-serif;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 1.1em;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-#create-ingredient-panel button[type="submit"]:hover {
-    background-color: var(--dark-fava);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    margin: 3rem auto 0;
+    max-height: 0; /* Start collapsed */
+    overflow: hidden; /* Hide content that overflows during transition */
+    transition: max-height 1s ease-out; /* Smooth transition for max-height */
+    display: none;
 }
 
 #shift-note {

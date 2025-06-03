@@ -22,22 +22,33 @@ async function getTableRows(table) {
     }
 }
 
-// Function to add a new ingredient to the database of given name and category
-function addNewIngredientEntry(name, category) {
+/// Function to add a new ingredient to the database of given name and category
+async function addNewIngredientEntry(name, category) {
     let path = '/backend/DB/new_ingredient.php';
 
-    fetch(path, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'  // Tell the server we're sending JSON
-        },
-        body: JSON.stringify({
-            'new-ingred-name': name,
-            'new-ingred-category' : category})
-    })
-    .then(response => response.json()) // Convert response to JSON
-    .then(response_json => console.log(response_json))
-    .catch(error => console.error('Error adding new ingredient:', error));
+    try {
+        const response = await fetch(path, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'new-ingred-name': name,
+                'new-ingred-category' : category
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        const responseJson = await response.json(); // Convert response to JSON
+        return responseJson; // Return the response from the server
+    } catch (error) {
+        console.error('Error adding new ingredient:', error);
+        throw error; // Re-throw the error for handling in createRecipe.js
+    }
 }
 
 // Function to add a new metadata option (e.g., Cuisine, Source) to the database
