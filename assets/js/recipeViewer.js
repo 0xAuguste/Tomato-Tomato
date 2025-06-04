@@ -17,97 +17,97 @@ async function loadAndDisplayRecipe(recipeId) {
         // Use the new helper function from db-handler.js
         const recipe = await getRecipeById(recipeId);
 
-        // Check if the recipe object itself contains an error message (e.g., recipe not found)
-        if (recipe.message) {
-            document.getElementById('recipe-title').innerText = recipe.message;
-            // Clear other fields if recipe not found
-            document.getElementById('recipe-description').innerHTML = '';
-            document.getElementById('ingredient-list').innerHTML = '';
-            document.getElementById('recipe-process').innerHTML = '';
-            document.getElementById('recipe-yield').innerText = '';
-            document.getElementById('recipe-source').innerText = '';
-            return;
+        // Display basic recipe info
+        document.getElementById('recipe-title').innerText = recipe.name || 'Untitled Recipe';
+        document.getElementById('recipe-yield').innerText = recipe.yield || 'N/A';
+        document.getElementById('recipe-source').innerText = recipe.source || 'N/A';
+
+
+        // Display Description
+        const descriptionDiv = document.getElementById('recipe-description');
+        descriptionDiv.innerHTML = ''; // Clear existing content
+        // recipe.description is already parsed by get_recipe.php, so it's an array of objects
+        const parsedDescription = recipe.description;
+
+        if (parsedDescription && parsedDescription.length > 0) {
+            parsedDescription.forEach(paragraphText => {
+            const p = document.createElement('p');
+            p.classList.add('recipe-paragraph');
+            p.innerText = paragraphText;
+            descriptionDiv.appendChild(p);
+            });
+        } else {
+            const p = document.createElement('p');
+            p.classList.add('recipe-paragraph');
+            p.innerText = "No description available.";
+            descriptionDiv.appendChild(p);
         }
 
-        displayRecipe(recipe);
 
+        // Display Ingredients List (still as a simple list)
+        const ingredientList = document.getElementById('ingredient-list');
+        ingredientList.innerHTML = ''; // Clear existing content
+
+        if (recipe.ingredients && recipe.ingredients.length > 0) {
+            recipe.ingredients.forEach(ingredient => {
+                const li = document.createElement('li');
+                // Use the stored displayText for the list item
+                li.innerText = ingredient.displayText;
+                ingredientList.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.innerText = "No ingredients listed.";
+            ingredientList.appendChild(li);
+        }
+
+        // Display Process
+        const processDiv = document.getElementById('recipe-process');
+        processDiv.innerHTML = ''; // Clear existing content
+        // recipe.process is already parsed by get_recipe.php, so it's an array of objects
+        const parsedProcess = recipe.process;
+
+        if (parsedProcess && parsedProcess.length > 0) {
+            parsedProcess.forEach(block => {
+                if (block.type === 'header') {
+                    const h3 = document.createElement('h3');
+                    h3.classList.add('section-header');
+                    h3.innerText = block.text;
+                    processDiv.appendChild(h3);
+                } else if (block.type === 'paragraph') {
+                    const p = document.createElement('p');
+                    p.classList.add('recipe-paragraph');
+                    block.content.forEach(segment => {
+                        if (segment.type === 'text') {
+                            p.appendChild(document.createTextNode(segment.text));
+                        } else if (segment.type === 'ingredient') {
+                            const span = document.createElement('span');
+                            span.classList.add('ingredient-text');
+                            span.id = segment.id; // Frontend ID
+                            span.innerText = segment.displayText;
+                            if (block.content.length === 1) {
+                                span.classList.add('orphan');
+                            }
+                            p.appendChild(span);
+                        }
+                    });
+                    processDiv.appendChild(p);
+                }
+            });
+        } else {
+            const p = document.createElement('p');
+            p.classList.add('recipe-paragraph');
+            p.innerText = "No instructions available.";
+            processDiv.appendChild(p);
+        }
     } catch (error) {
+        console.error("Error fetching or displaying recipe:", error);
         document.getElementById('recipe-title').innerText = "Error loading recipe.";
-        document.getElementById('recipe-description').innerText = "Please try again later.";
+        document.getElementById('recipe-description').innerText = `Details: ${error.message}`;
         // Clear other fields on error
         document.getElementById('ingredient-list').innerHTML = '';
         document.getElementById('recipe-process').innerHTML = '';
         document.getElementById('recipe-yield').innerText = '';
         document.getElementById('recipe-source').innerText = '';
-    }
-}
-
-function displayRecipe(recipe) {
-    document.getElementById('recipe-title').innerText = recipe.name;
-
-    // Display Meta Data
-    document.getElementById('recipe-yield').innerText = recipe.yield ? `Makes: ${recipe.yield}` : '';
-    document.getElementById('recipe-source').innerText = recipe.source ? `From: ${recipe.source}` : '';
-
-
-    // Display Description
-    const descriptionDiv = document.getElementById('recipe-description');
-    if (recipe.description && recipe.description.length > 0) {
-        recipe.description.forEach(paragraphText => {
-            const p = document.createElement('p');
-            p.classList.add('recipe-paragraph');
-            p.innerText = paragraphText;
-            descriptionDiv.appendChild(p);
-        });
-    } else {
-        const p = document.createElement('p');
-        p.classList.add('recipe-paragraph');
-        p.innerText = "No description available.";
-        descriptionDiv.appendChild(p);
-    }
-
-    // Display Ingredients
-    const ingredientList = document.getElementById('ingredient-list');
-    ingredientList.innerHTML = ''; // Clear previous ingredients
-    if (recipe.ingredients && recipe.ingredients.length > 0) {
-        recipe.ingredients.forEach(ingredient => {
-            const li = document.createElement('li');
-            li.innerText = ingredient.displayText || `${ingredient.quantity || ''} ${ingredient.unitName || ''} ${ingredient.ingredientName}`;
-            ingredientList.appendChild(li);
-        });
-    } else {
-        const li = document.createElement('li');
-        li.innerText = "No ingredients listed.";
-        ingredientList.appendChild(li);
-    }
-
-    // Display Process
-    const processDiv = document.getElementById('recipe-process');
-
-    if (recipe.process && recipe.process.length > 0) {
-        recipe.process.forEach(step => {
-            const p = document.createElement('p');
-            p.classList.add('recipe-paragraph');
-            if (step.type === 'header') {
-                const h3 = document.createElement('h3');
-                h3.classList.add('section-header');
-                h3.innerText = step.text;
-                processDiv.appendChild(h3);
-            } else if (step.type === 'ingredient') {
-                const span = document.createElement('span');
-                span.classList.add('ingredient-text');
-                span.innerText = step.display; // Use the stored display text for ingredients
-                p.appendChild(span);
-                processDiv.appendChild(p);
-            } else { // 'paragraph' type
-                p.innerText = step.text;
-                processDiv.appendChild(p);
-            }
-        });
-    } else {
-        const p = document.createElement('p');
-        p.classList.add('recipe-paragraph');
-        p.innerText = "No instructions available.";
-        processDiv.appendChild(p);
     }
 }

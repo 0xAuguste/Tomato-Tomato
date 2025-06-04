@@ -154,8 +154,8 @@ function textBoxClick(e, elem) {
                 paragraphs.push(child);
             }
         }
-
-        paragraphs.pop().focus();
+        let focus_paragraph = paragraphs.pop()
+        moveCursorToEnd(focus_paragraph);
     }
 }
 
@@ -240,8 +240,6 @@ function showDropdown(inputElem, tableName, showAllOnFocus) {
         case 'ingredientCategory': optionsToDisplay = ingredientCategoryOptions; break;
     }
 
-    console.log(optionsToDisplay);
-
     list.innerHTML = '';
     optionsToDisplay.forEach(row => {
         let listItem = document.createElement("li");
@@ -273,10 +271,7 @@ function capitalize(word) {
 
 // Adds ingredient to the recipe
 function saveAddIngredient() {
-    let newParagraph = document.createElement("p");
-    newParagraph.classList.add("recipe-paragraph");
-    newParagraph.setAttribute('contenteditable', 'true');
-    newParagraph.setAttribute('onkeydown', 'textHandler(event, this)');
+    // Create ingredient text span
     let ingredientText = document.createElement("span");
     ingredientText.setAttribute('contenteditable', 'false');
     ingredientText.classList.add("ingredient-text");
@@ -288,13 +283,14 @@ function saveAddIngredient() {
     let ingredientHiddenId = document.getElementById("add-ingred-name-id");
     let unitInput = document.getElementById("add-ingred-unit-input");
     let unitHiddenId = document.getElementById("add-ingred-unit-id");
-
+    let quantityInput = document.getElementById("add-ingred-quantity");
+    let displayTextInput = document.getElementById("add-ingred-display");
     let name = ingredientInput.value; // Display name from the input
     let ingredientDbId = ingredientHiddenId.value; // Actual DB ID from hidden input
-    let quantity = document.getElementById("add-ingred-quantity").value;
+    let quantity = quantityInput.value;
     let unit = unitInput.value; // Display unit from the input
     let unitDbId = unitHiddenId.value; // Actual DB ID from hidden input
-    let displayText = document.getElementById("add-ingred-display").value;
+    let displayText = displayTextInput.value;
 
     // Basic validation for selected ingredient/unit
     if (!ingredientDbId) {
@@ -325,21 +321,16 @@ function saveAddIngredient() {
 
     ingredientText.id = id; // Set the ID on the span after validation
     ingredientText.innerText = displayText;
-    newParagraph.append(ingredientText);
-    let previousPara = document.getElementById("recipe-process").lastElementChild;
-    // Ensure previousPara exists and is a paragraph, otherwise append to process directly
-    if (previousPara && previousPara.classList.contains('recipe-paragraph')) {
-        previousPara.after(newParagraph);
-        if (previousPara.innerText.trim() === "") { // Only remove if it's an empty paragraph
-            previousPara.remove();
-        }
-    } else {
-        document.getElementById("recipe-process").append(newParagraph);
-    }
 
+    let lastParagraph = document.getElementById("recipe-process").lastElementChild;
+    if (isEmpty(lastParagraph)){
+        ingredientText.classList.add("orphan")
+    }
+    
+    lastParagraph.append(ingredientText); // add span to last recipe-paragraph
 
     closeAddIngredient();
-    moveCursorToEnd(newParagraph);
+    moveCursorToEnd(lastParagraph);
     console.log(recipeData);
 
     // Clear the input fields after adding ingredient
@@ -347,8 +338,8 @@ function saveAddIngredient() {
     ingredientHiddenId.value = "";
     unitInput.value = "";
     unitHiddenId.value = "";
-    document.getElementById("add-ingred-quantity").value = "";
-    document.getElementById("add-ingred-display").value = "";
+    quantityInput.value = "";
+    displayTextInput.value = "";
 }
 
 // Opens ingredient editor for clicked ingredient
@@ -623,4 +614,8 @@ async function saveNewIngredientToDB() {
         console.error('Error saving new ingredient to DB:', error);
         displayMessage(`Error saving new ingredient: ${error.message}`, 'error');
     }
+}
+
+function isEmpty(paragraph) {
+    return paragraph.childNodes.length === 0;
 }
