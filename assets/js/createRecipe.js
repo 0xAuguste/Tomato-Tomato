@@ -46,6 +46,12 @@ function closeAddIngredient() {
     closeCreateIngredient();
     var panel = document.getElementById("add-ingredient-panel");
     panel.style.display = "none";
+    document.getElementById('add-ingred-quantity').value = '';
+    document.getElementById('add-ingred-unit-input').value = '';
+    document.getElementById('add-ingred-unit-id').value = '';
+    document.getElementById('add-ingred-name-input').value = '';
+    document.getElementById('add-ingred-name-id').value = '';
+    document.getElementById('add-ingred-display').value = '';
 }
 
 // Toggles display of #create-ingredient-panel
@@ -56,6 +62,9 @@ function openCreateIngredient() {
     setTimeout(() => {
         panel.style.maxHeight = panel.scrollHeight + "px"; // Expand to full height
     }, 10); // A very small delay
+    setTimeout(() => {
+        panel.style.overflow = "visible";
+    }, 1000);
 
     // Pre-fill the new ingredient name from the add ingredient input
     const addIngredNameInput = document.getElementById('add-ingred-name-input');
@@ -70,6 +79,8 @@ function closeCreateIngredient() {
     var panel = document.getElementById("create-ingredient-panel");
     panel.style.maxHeight = "0"; // Collapse panel
     panel.style.display = "none"; // Hide panel
+    panel.style.overflow = "hidden";
+
     // Clear the new ingredient form fields
     document.getElementById('create-ingred-name-input').value = '';
     document.getElementById('create-ingred-class-input').value = '';
@@ -166,7 +177,7 @@ async function optionFilter(inputElem, tableName) {
         case 'type': optionsToFilter = typeOptions; break;
         case 'meal': optionsToFilter = mealOptions; break;
         case 'source': optionsToFilter = sourceOptions; break;
-        case 'ingredientCategory': options = ingredientCategoryOptions; break;
+        case 'ingredientCategory': optionsToFilter = ingredientCategoryOptions; break;
     }
 
     let filteredOptions = optionsToFilter.filter(row =>
@@ -590,7 +601,7 @@ async function saveNewIngredientToDB() {
         return;
     }
     if (!newIngredCategoryName || !newIngredCategoryId) {
-        displayMessage('Please select or create a category for the new ingredient.', 'error');
+        displayMessage('Please select a valid category for the new ingredient.', 'error');
         return;
     }
 
