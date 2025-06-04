@@ -26,10 +26,6 @@ async function loadAndDisplayRecipe(recipeId) {
             document.getElementById('recipe-process').innerHTML = '';
             document.getElementById('recipe-yield').innerText = '';
             document.getElementById('recipe-source').innerText = '';
-            document.getElementById('recipe-cuisine').innerText = '';
-            document.getElementById('recipe-meal').innerText = '';
-            document.getElementById('recipe-season').innerText = '';
-            document.getElementById('recipe-type').innerText = '';
             return;
         }
 
@@ -43,10 +39,6 @@ async function loadAndDisplayRecipe(recipeId) {
         document.getElementById('recipe-process').innerHTML = '';
         document.getElementById('recipe-yield').innerText = '';
         document.getElementById('recipe-source').innerText = '';
-        document.getElementById('recipe-cuisine').innerText = '';
-        document.getElementById('recipe-meal').innerText = '';
-        document.getElementById('recipe-season').innerText = '';
-        document.getElementById('recipe-type').innerText = '';
     }
 }
 
@@ -54,12 +46,8 @@ function displayRecipe(recipe) {
     document.getElementById('recipe-title').innerText = recipe.name;
 
     // Display Meta Data
-    document.getElementById('recipe-yield').innerText = recipe.yield ? `Yield: ${recipe.yield}` : '';
-    document.getElementById('recipe-source').innerText = recipe.source ? `Source: ${recipe.source}` : '';
-    document.getElementById('recipe-cuisine').innerText = recipe.cuisine ? `Cuisine: ${recipe.cuisine}` : '';
-    document.getElementById('recipe-meal').innerText = recipe.meal ? `Meal: ${recipe.meal}` : '';
-    document.getElementById('recipe-season').innerText = recipe.season ? `Season: ${recipe.season}` : '';
-    document.getElementById('recipe-type').innerText = recipe.type ? `Type: ${recipe.type}` : '';
+    document.getElementById('recipe-yield').innerText = recipe.yield ? `Makes: ${recipe.yield}` : '';
+    document.getElementById('recipe-source').innerText = recipe.source ? `From: ${recipe.source}` : '';
 
 
     // Display Description

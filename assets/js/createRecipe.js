@@ -473,7 +473,6 @@ async function loadDropdownOptions() {
     seasonOptions = await getTableRows('season');
 
     typeOptions = await getTableRows('type');
-    typeOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
 
     mealOptions = await getTableRows('meal');
 

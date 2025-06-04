@@ -5,4 +5,20 @@
 }
 #recipe-title {
     font-size: 2.7rem;
+    margin: 0 auto 2rem;
+}
+#recipe-metadata {
+    display: flex;
+    margin: 0 auto 5rem;
+    width: fit-content;
+}
+.metadata-item {
+    margin: 0;
+    padding: 0 2rem;
+}
+#recipe-yield {
+    text-align: right;
+}
+#recipe-ingredients {
+    display: none;
 }

@@ -19,13 +19,9 @@
 	
 	<div id="recipe-body">
 		<h1 name="recipe-title" id="recipe-title"></h1>
-        <div id="recipe-meta-data">
-            <p id="recipe-yield"></p>
-            <p id="recipe-source"></p>
-            <p id="recipe-cuisine"></p>
-            <p id="recipe-meal"></p>
-            <p id="recipe-season"></p>
-            <p id="recipe-type"></p>
+        <div id="recipe-metadata">
+            <p id="recipe-yield" class="metadata-item"></p>
+            <p id="recipe-source" class="metadata-item"></p>
         </div>
         <div id="recipe-ingredients">
             <h4 class="section-label">Ingredients</h4>
