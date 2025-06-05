@@ -39,11 +39,12 @@ try {
     // Fetch ingredients for the recipe
     $sql_ingredients = "
         SELECT 
-            ri.quantity, 
-            ri.displayText,
-            ri.frontendIngredID,
             i.name AS ingredientName,
-            u.name AS unitName
+            ri.ingredientID,
+            ri.quantity,
+            u.name AS unitName,
+            ri.displayText,
+            ri.frontendIngredID
         FROM recipe_ingredients ri
         JOIN ingredient i ON ri.ingredientID = i.id
         LEFT JOIN unit u ON ri.unitID = u.id

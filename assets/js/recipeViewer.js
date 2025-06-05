@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const recipeId = urlParams.get('id');
-    console.log(recipeId);
 
     if (recipeId) {
         await loadAndDisplayRecipe(recipeId);
@@ -19,9 +18,11 @@ async function loadAndDisplayRecipe(recipeId) {
 
         // Display basic recipe info
         document.getElementById('recipe-title').innerText = recipe.name || 'Untitled Recipe';
-        document.getElementById('recipe-yield').innerText = recipe.yield || 'N/A';
-        document.getElementById('recipe-source').innerText = recipe.source || 'N/A';
-
+        document.getElementById('recipe-yield').innerText = recipe.yield ? `Makes: ${recipe.yield}` : '';
+        document.getElementById('recipe-yield').style.display = recipe.yield ? 'block' : 'none'; // hide if empty
+        document.getElementById('recipe-source').innerText = recipe.source ? `From: ${recipe.source}` : '';
+        document.getElementById('recipe-source').style.display = recipe.source ? 'block' : 'none'; // hide if empty
+        document.getElementById('recipe-metadata').style.display = (!recipe.source && !recipe.yield) ? 'none' : 'flex';
 
         // Display Description
         const descriptionDiv = document.getElementById('recipe-description');
@@ -29,7 +30,7 @@ async function loadAndDisplayRecipe(recipeId) {
         // recipe.description is already parsed by get_recipe.php, so it's an array of objects
         const parsedDescription = recipe.description;
 
-        if (parsedDescription && parsedDescription.length > 0) {
+        if (parsedDescription && parsedDescription[0] !== "") {
             parsedDescription.forEach(paragraphText => {
             const p = document.createElement('p');
             p.classList.add('recipe-paragraph');
@@ -37,10 +38,7 @@ async function loadAndDisplayRecipe(recipeId) {
             descriptionDiv.appendChild(p);
             });
         } else {
-            const p = document.createElement('p');
-            p.classList.add('recipe-paragraph');
-            p.innerText = "No description available.";
-            descriptionDiv.appendChild(p);
+            document.getElementById('recipe-description').style.display = 'none';
         }
 
 

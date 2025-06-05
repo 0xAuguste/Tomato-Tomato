@@ -18,17 +18,17 @@
 	?>
 	
 	<div id="recipe-body">
-		<h1 name="recipe-title" id="recipe-title"></h1>
+		<h1 id="recipe-title"></h1>
         <div id="recipe-metadata">
             <p id="recipe-yield" class="metadata-item"></p>
             <p id="recipe-source" class="metadata-item"></p>
         </div>
-        <div id="recipe-ingredients">
+        <div id="recipe-ingredients" class="recipe-section">
             <h4 class="section-label">Ingredients</h4>
             <ul id="ingredient-list"></ul>
         </div>
-        <div name="recipe-description" id="recipe-description"></div>
-        <div name="recipe-process" id="recipe-process"></div>
+        <div id="recipe-description" class="recipe-section"></div>
+        <div id="recipe-process" class="recipe-section"></div>
 	</div>
 	
 

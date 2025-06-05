@@ -76,7 +76,6 @@ a {
 #recipe-body {
     width: min(55%, 800px);
     position: relative;
-    /* border: 1px solid black; */
 }
 #recipe-title {
     display: block;
