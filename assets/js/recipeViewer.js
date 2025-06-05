@@ -68,10 +68,11 @@ async function loadAndDisplayRecipe(recipeId) {
         if (parsedProcess && parsedProcess.length > 0) {
             parsedProcess.forEach(block => {
                 if (block.type === 'header') {
-                    const h3 = document.createElement('h3');
-                    h3.classList.add('section-header');
-                    h3.innerText = block.text;
-                    processDiv.appendChild(h3);
+                    const header = document.createElement('p');
+                    header.classList.add('section-header');
+                    header.classList.add('recipe-paragraph');
+                    header.innerText = block.text;
+                    processDiv.appendChild(header);
                 } else if (block.type === 'paragraph') {
                     const p = document.createElement('p');
                     p.classList.add('recipe-paragraph');

@@ -37,7 +37,9 @@ class RecipeData {
         const structuredProcess = [];
 
         for (const element of processElements) {
-            if (element.classList.contains('recipe-paragraph')) {
+            if (element.classList.contains('section-header')) {
+                structuredProcess.push({ type: 'header', text: element.innerText });
+            } else if (element.classList.contains('recipe-paragraph')) {
                 const paragraphContent = [];
                 // Iterate through all child nodes (text nodes and element nodes)
                 for (const node of element.childNodes) {
@@ -71,9 +73,6 @@ class RecipeData {
                 if (paragraphContent.length > 0) {
                 structuredProcess.push({ type: 'paragraph', content: paragraphContent });
                 }
-            } else if (element.classList.contains('section-header')) {
-                // This is a section header
-                structuredProcess.push({ type: 'header', text: element.innerText });
             }
         }
         this.process = structuredProcess;

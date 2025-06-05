@@ -103,6 +103,3 @@ a {
     min-height: 1.2em;
     line-height: 1.2;
 }
-.recipe-paragraph:has(.ingredient-text) {
-    margin: 10px 0;
-}
