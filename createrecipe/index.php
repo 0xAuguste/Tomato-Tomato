@@ -1,3 +1,9 @@
+<?php
+define('__ROOT__', dirname(dirname(__FILE__)));
+
+require_once(__ROOT__.'/backend/auth/session.php');
+requireLoginPage(); // Before any output, so the redirect header can be sent
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,8 +17,6 @@
 </head>
 <body>
 	<?php
-	define('__ROOT__', dirname(dirname(__FILE__)));
-
 	require_once(__ROOT__.'/backend/utils/printers.php');
 	printHeader();
 	?>

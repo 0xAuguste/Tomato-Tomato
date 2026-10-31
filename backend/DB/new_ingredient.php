@@ -7,6 +7,10 @@ header('Content-Type: application/json');
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Origin: *"); // Ensure CORS is enabled for development
 
+// Only logged-in users can add ingredients
+require_once(__DIR__ . '/../auth/session.php');
+requireLoginApi();
+
 // Check that we received an ingredient via POST and assign variables
 $input = json_decode(file_get_contents('php://input'), true);
 

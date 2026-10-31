@@ -15,6 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
+// Only logged-in users can save recipes
+require_once(__DIR__ . '/../auth/session.php');
+requireLoginApi();
+
 // Ensure it's a POST request
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Decode the JSON input from the request body

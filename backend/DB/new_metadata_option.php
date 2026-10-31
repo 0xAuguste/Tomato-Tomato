@@ -6,6 +6,10 @@ header("Access-Control-Allow-Origin: *"); // Allow all origins for development. 
 // Require the UUID helper function
 require_once(__DIR__ . '/../utils/uuid.php');
 
+// Only logged-in users can add options
+require_once(__DIR__ . '/../auth/session.php');
+requireLoginApi();
+
 $input = json_decode(file_get_contents('php://input'), true);
 
 if(isset($input['name']) && isset($input['table'])) {
