@@ -5,7 +5,7 @@ input, button {
     text-align: center;
 }
 input:focus {
-    outline: 2px solid var(--window-trim);
+    outline: none;
 }
 #recipe-body {
     background-color: var(--aix-door);
@@ -179,9 +179,6 @@ input:focus {
     font-weight: 700;
     cursor: pointer;
 }
-.ingredient-text.ProseMirror-selectednode { /* Ingredient selected, e.g. before Backspace deletes it */
-    outline: 2px solid var(--window-trim);
-}
 .orphan {
     margin-left: 2rem;
 }
@@ -277,10 +274,6 @@ input:focus {
 
 .dropdown-container {
     position: relative;
-}
-
-.dropdown-input:focus {
-    outline: 2px solid var(--window-trim);
 }
 
 .dropdown-list-container {
