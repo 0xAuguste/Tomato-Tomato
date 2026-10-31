@@ -1,5 +1,5 @@
 // Sets up the Tiptap editors for the recipe description and process.
-// Loaded as a module; exposes descriptionEditor, processEditor and insertIngredient() on window
+// Loaded as a module; exposes descriptionEditor, processEditor, insertIngredient() and updateIngredient() on window
 // so the classic scripts (createRecipe.js, recipeData.js) can use them.
 import { Editor, Node, Extension, mergeAttributes, Document, Paragraph, Text, Heading, UndoRedo,
          Plugin, PluginKey, Decoration, DecorationSet } from '/assets/js/vendor/tiptap.js';
@@ -124,4 +124,19 @@ window.insertIngredient = function (ingredient) {
         content.push({ type: 'text', text: ' ' });
     }
     processEditor.chain().focus().insertContent(content).run();
+};
+
+// Replaces the data of every ingredient node with the given frontend ID (copy-pasted ingredients share
+// an ID and are saved as one, so they're kept in sync)
+window.updateIngredient = function (ingredient) {
+    const attrs = {};
+    ingredientFields.forEach(field => attrs[field] = String(ingredient[field]));
+
+    const { tr } = processEditor.state;
+    processEditor.state.doc.descendants((node, pos) => {
+        if (node.type.name === 'ingredient' && node.attrs.id === attrs.id) {
+            tr.setNodeMarkup(pos, null, attrs);
+        }
+    });
+    processEditor.view.dispatch(tr);
 };
