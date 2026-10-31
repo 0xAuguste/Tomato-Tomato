@@ -10,6 +10,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Shows "By {author}", linking the author's name to the source link if there is one
+function displayAuthor(author, link) {
+    const sourceElem = document.getElementById('recipe-source');
+    sourceElem.innerHTML = ''; // Clear existing content
+    sourceElem.style.display = author ? 'block' : 'none'; // hide if empty
+    if (!author) {
+        return;
+    }
+
+    sourceElem.appendChild(document.createTextNode('By '));
+    if (link && /^https?:\/\//i.test(link)) { // Only web links
+        const a = document.createElement('a');
+        a.href = link;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.innerText = author;
+        sourceElem.appendChild(a);
+    } else {
+        sourceElem.appendChild(document.createTextNode(author));
+    }
+}
+
 // Function to load and display recipe data using the db-handler.js helper
 async function loadAndDisplayRecipe(recipeId) {
     try {
@@ -18,10 +40,9 @@ async function loadAndDisplayRecipe(recipeId) {
 
         // Display basic recipe info
         document.getElementById('recipe-title').innerText = recipe.name || 'Untitled Recipe';
-        document.getElementById('recipe-yield').innerText = recipe.yield ? `Makes: ${recipe.yield}` : '';
+        document.getElementById('recipe-yield').innerText = recipe.yield ? `Makes ${recipe.yield}` : '';
         document.getElementById('recipe-yield').style.display = recipe.yield ? 'block' : 'none'; // hide if empty
-        document.getElementById('recipe-source').innerText = recipe.source ? `From: ${recipe.source}` : '';
-        document.getElementById('recipe-source').style.display = recipe.source ? 'block' : 'none'; // hide if empty
+        displayAuthor(recipe.source, recipe.sourceLink);
         document.getElementById('recipe-metadata').style.display = (!recipe.source && !recipe.yield) ? 'none' : 'flex';
 
         // Display Description

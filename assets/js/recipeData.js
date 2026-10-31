@@ -5,7 +5,8 @@ class RecipeData {
         this.process = [];
         this.ingredients = [];
         this.yield = "";
-        this.source = "";
+        this.source = ""; // Author (source table) ID
+        this.sourceLink = "";
         this.cuisine = "";
         this.meal = "";
         this.season = "";

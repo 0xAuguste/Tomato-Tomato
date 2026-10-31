@@ -54,11 +54,11 @@ try {
     $stmt_ingredients->execute();
     $ingredients = $stmt_ingredients->fetchAll();
 
-    $sql_source = "SELECT s.name FROM recipe_sources rs JOIN source s ON rs.sourceID = s.id WHERE rs.recipeID = :recipeID";
+    $sql_source = "SELECT s.name, rs.link FROM recipe_sources rs JOIN source s ON rs.sourceID = s.id WHERE rs.recipeID = :recipeID";
     $stmt_source = $pdo->prepare($sql_source);
     $stmt_source->bindParam(':recipeID', $recipeID);
     $stmt_source->execute();
-    $source = $stmt_source->fetchColumn();
+    $source = $stmt_source->fetch(); // Author name and link
 
     $sql_cuisine = "SELECT c.name FROM recipe_cuisines rc JOIN cuisine c ON rc.cuisineID = c.id WHERE rc.recipeID = :recipeID";
     $stmt_cuisine = $pdo->prepare($sql_cuisine);
@@ -93,7 +93,8 @@ try {
         'process' => json_decode($recipe['process'], true),
         'yield' => $recipe['yield'],
         'ingredients' => $ingredients,
-        'source' => $source,
+        'source' => $source ? $source['name'] : null,
+        'sourceLink' => $source && $source['link'] ? $source['link'] : null,
         'cuisine' => $cuisine,
         'meal' => $meal,
         'season' => $season,

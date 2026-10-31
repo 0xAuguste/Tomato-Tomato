@@ -1,0 +1,62 @@
+/* Styling for recipe page */
+
+#recipe-body {
+    margin: 3rem auto 4rem;
+}
+#recipe-title {
+    font-size: 2.7rem;
+    padding: 2rem 0 0.75rem;
+    margin: 0 auto;
+}
+#recipe-metadata {
+    display: flex;
+    margin: 0 auto 2rem;
+    width: fit-content;
+}
+.metadata-item {
+    margin: 0;
+    padding: 0 2rem;
+}
+#recipe-yield {
+    text-align: right;
+}
+#recipe-yield:not(:empty) + #recipe-source:not(:empty) { /* Rule between yield and author, only when both are shown */
+    border-left: 1px solid var(--chalkboard);
+}
+#recipe-source a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--light-fava);
+    text-underline-offset: 3px;
+}
+#recipe-source a:hover {
+    color: var(--dark-fava);
+}
+.recipe-section {
+    margin: 2.5rem auto;
+}
+#recipe-process {
+    margin-top: 3rem;
+}
+#recipe-process::before { /* Short centered rule above the process, shown whether or not there's a description */
+    content: '';
+    display: block;
+    width: 30%;
+    margin: 0 auto 3rem;
+    border-top: 1px solid var(--chalkboard);
+}
+#recipe-ingredients {
+    display: none;
+}
+.ingredient-text {
+    font-weight: 1000;
+}
+.orphan {
+    margin-left: 2rem;
+}
+.recipe-paragraph:has(.orphan) {
+    margin: -3px 0 5px;
+}
+.section-header {
+    margin-top: 1.5rem;
+}
