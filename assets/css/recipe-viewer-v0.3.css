@@ -60,3 +60,33 @@
 .section-header {
     margin-top: 1.5rem;
 }
+
+@media (max-width: 700px) {
+    #recipe-body {
+        margin: 1.5rem auto 3rem;
+    }
+    #recipe-title {
+        font-size: 2rem;
+        padding-top: 1rem;
+    }
+    .metadata-item { /* Text wraps within each item rather than the items wrapping, so the rule stays between them */
+        padding: 0 1rem;
+        text-wrap: balance;
+    }
+    #recipe-yield { /* Yields are short; let the source do the wrapping */
+        flex-shrink: 0;
+        max-width: 50%;
+    }
+    .recipe-section {
+        margin: 2rem auto;
+    }
+    #recipe-process {
+        margin-top: 2rem;
+    }
+    #recipe-process::before {
+        margin-bottom: 2rem;
+    }
+    .orphan {
+        margin-left: 1rem;
+    }
+}
