@@ -2,3 +2,4 @@
 .vscode/extensions.json
 databaseKeys.php
 .DS_Store
+node_modules/
