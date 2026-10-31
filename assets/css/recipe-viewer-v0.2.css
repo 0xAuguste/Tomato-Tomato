@@ -20,6 +20,15 @@
 #recipe-yield {
     text-align: right;
 }
+#recipe-source a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--light-fava);
+    text-underline-offset: 3px;
+}
+#recipe-source a:hover {
+    color: var(--dark-fava);
+}
 .recipe-section {
     margin: 2.5rem auto;
 }

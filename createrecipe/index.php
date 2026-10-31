@@ -35,17 +35,25 @@
                 <input type="text" id="recipe-yield-input" class="user-input">
             </div>
             <div class="metadata-field user-input">
-                <div class="section-label">Source</div>
+                <div class="section-label">Author</div>
+                <!-- Authors are stored in the source table -->
                 <div class="dropdown-container">
-                    <input type="text" id="recipe-source-input" class="dropdown-input" onkeyup="optionFilter(this, 'source')" onblur="hideDropdown(this)">
+                    <input type="text" id="recipe-source-input" class="dropdown-input" autocomplete="off" onkeyup="optionFilter(this, 'source')" onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-source-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>
             </div>
+            <div class="metadata-field user-input">
+                <div class="section-label">Source Link</div>
+                <input type="url" id="recipe-source-link-input" class="user-input" placeholder="https://" autocomplete="off">
+            </div>
 			<div class="metadata-field user-input">
-                <div class="section-label">Cuisine</div>
+                <div class="section-label" onclick="document.getElementById('recipe-cuisine-input').focus()">Cuisine</div>
                 <div class="dropdown-container">
-                    <input type="text" id="recipe-cuisine-input" class="dropdown-input" onkeyup="optionFilter(this, 'cuisine')" onblur="hideDropdown(this)">
+                    <input type="text" id="recipe-cuisine-input" class="dropdown-input" autocomplete="off"
+                        onkeyup="optionFilter(this, 'cuisine')"
+                        onfocus="showDropdown(this, 'cuisine', true)"
+                        onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-cuisine-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>

@@ -224,6 +224,7 @@ async function saveRecipe() {
     
     // Get metadata
     recipeData.source = document.getElementById('recipe-source-id').value;
+    recipeData.sourceLink = normalizeLink(document.getElementById('recipe-source-link-input').value);
     recipeData.yield = document.getElementById('recipe-yield-input').value;
     recipeData.cuisine = document.getElementById('recipe-cuisine-id').value;
     recipeData.season = document.getElementById('recipe-season-id').value;
@@ -237,6 +238,7 @@ async function saveRecipe() {
         process: JSON.stringify(recipeData.process),
         ingredients: JSON.stringify(recipeData.ingredients), // This will contain frontend IDs and DB IDs
         ...(recipeData.source.length > 0 ? { sourceID: recipeData.source} : {}),
+        ...(recipeData.sourceLink.length > 0 ? { sourceLink: recipeData.sourceLink} : {}),
         ...(recipeData.yield.length > 0 ? { yield: recipeData.yield} : {}),
         ...(recipeData.cuisine.length > 0 ? { cuisineID: recipeData.cuisine} : {}),
         ...(recipeData.season.length > 0 ? { seasonID: recipeData.season} : {}),
@@ -259,6 +261,7 @@ async function saveRecipe() {
 function validRecipe() {
     const recipeTitle = document.getElementById('recipe-title').value.trim();
     const isProcessPopulated = processEditor.getText().trim() !== ""; // Includes ingredient display text
+    const sourceLinkInput = document.getElementById('recipe-source-link-input');
 
     if (recipeTitle === "") {
         displayMessage("Please enter a recipe title before saving.", 'error');
@@ -268,9 +271,34 @@ function validRecipe() {
         displayMessage("Please add at least one step to the recipe process before saving.", 'error');
         processEditor.commands.focus('end');
         return false;
+    } else if (sourceLinkInput.value.trim() !== "" && normalizeLink(sourceLinkInput.value) === "") {
+        displayMessage("Please enter a valid source link.", 'error');
+        sourceLinkInput.focus();
+        return false;
+    } else if (sourceLinkInput.value.trim() !== "" && !document.getElementById('recipe-source-id').value) {
+        displayMessage("Please choose an author for the source link.", 'error'); // Links are stored with the author
+        document.getElementById('recipe-source-input').focus();
+        return false;
     }
     else {
         return true;
+    }
+}
+
+// Returns the link as a full http(s) URL, adding https:// if missing, or "" if it isn't a valid web link
+function normalizeLink(link) {
+    link = link.trim();
+    if (link === "") {
+        return "";
+    }
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(link)) {
+        link = "https://" + link;
+    }
+    try {
+        const url = new URL(link);
+        return (url.protocol === 'http:' || url.protocol === 'https:') && url.hostname.includes('.') ? url.href : "";
+    } catch {
+        return "";
     }
 }
 
