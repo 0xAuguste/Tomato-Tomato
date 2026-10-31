@@ -28,7 +28,8 @@ try {
 
 }
 catch (PDOException $e) {
-    echo json_encode(["error" => "Connection failed: " . $e->getMessage()]);
+    error_log("Connection failed: " . $e->getMessage()); // Details stay in the server log
+    echo json_encode(["error" => "Connection failed."]);
     exit;
 }
 
@@ -66,7 +67,8 @@ try {
 }
 catch (PDOException $e) {
     http_response_code(500); // Internal Server Error
-    echo json_encode(["error" => "Error adding new ingredient: " . $e->getMessage()]);
+    error_log("Error adding new ingredient: " . $e->getMessage()); // Details stay in the server log
+    echo json_encode(["error" => "Error adding new ingredient."]);
 }
 
 ?>

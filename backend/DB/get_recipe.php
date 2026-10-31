@@ -10,7 +10,8 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Enable exceptions for better error handling
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC); // Fetch as associative array by default
 } catch (PDOException $e) {
-    echo json_encode(["error" => "Connection failed: " . $e->getMessage()]);
+    error_log("Connection failed: " . $e->getMessage()); // Details stay in the server log
+    echo json_encode(["error" => "Connection failed."]);
     exit;
 }
 
@@ -109,7 +110,8 @@ try {
 
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(["message" => "Error fetching recipe: " . $e->getMessage()]);
+    error_log("Error fetching recipe: " . $e->getMessage()); // Details stay in the server log
+    echo json_encode(["message" => "Error fetching recipe."]);
     exit();
 }
 ?>
