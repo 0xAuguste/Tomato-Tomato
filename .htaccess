@@ -1,0 +1,2 @@
+# Hide the git repository that Hostinger's Git deployment places in the web root
+RedirectMatch 404 /\.git
