@@ -36,17 +36,20 @@ try {
         exit();
     }
 
-    // Fetch ingredients for the recipe
+    // Fetch ingredients for the recipe. An ingredient is either an ingredient or another recipe;
+    // linkedRecipeID is only returned while that recipe still exists, so the viewer never links to a missing page.
     $sql_ingredients = "
-        SELECT 
-            i.name AS ingredientName,
+        SELECT
+            COALESCE(i.name, lr.name) AS ingredientName,
             ri.ingredientID,
+            lr.id AS linkedRecipeID,
             ri.quantity,
             u.name AS unitName,
             ri.displayText,
             ri.frontendIngredID
         FROM recipe_ingredients ri
-        JOIN ingredient i ON ri.ingredientID = i.id
+        LEFT JOIN ingredient i ON ri.ingredientID = i.id
+        LEFT JOIN recipe lr ON ri.linkedRecipeID = lr.id
         LEFT JOIN unit u ON ri.unitID = u.id
         WHERE ri.recipeID = :recipeID";
     $stmt_ingredients = $pdo->prepare($sql_ingredients);

@@ -11,6 +11,7 @@ class RecipeData {
         this.meal = "";
         this.season = "";
         this.type = "";
+        this.listAsIngredient = false; // Show this recipe in the ingredient dropdown
     }
 
     // Reads paragraphs from the description editor (see recipeEditor.js) as an array of strings
@@ -60,7 +61,7 @@ class RecipeData {
         editor.state.doc.descendants(node => {
             if (node.type.name === 'ingredient' && !ingredientsByID.has(node.attrs.id)) {
                 const a = node.attrs;
-                ingredientsByID.set(a.id, new Ingredient(a.id, a.name, a.ingredientDbId, a.quantity, a.unit, a.unitDbId, a.displayText));
+                ingredientsByID.set(a.id, new Ingredient(a.id, a.name, a.ingredientDbId, a.quantity, a.unit, a.unitDbId, a.displayText, a.linkedRecipeId));
             }
         });
         this.ingredients = [...ingredientsByID.values()];
@@ -68,7 +69,7 @@ class RecipeData {
 }
 
 class Ingredient {
-    constructor(id, name, ingredientDbId, quantity, unit, unitDbId, displayText) {
+    constructor(id, name, ingredientDbId, quantity, unit, unitDbId, displayText, linkedRecipeId = "") {
         this.id = id; // Frontend unique ID (Date.now()), links process segments to recipe_ingredients rows
         this.name = name; // Display name
         this.quantity = quantity;
@@ -76,5 +77,6 @@ class Ingredient {
         this.ingredientDbId = ingredientDbId; // Actual database ID for the ingredient
         this.unitDbId = unitDbId;           // Actual database ID for the unit
         this.displayText = displayText;
+        this.linkedRecipeId = linkedRecipeId; // Recipe used as this ingredient (then ingredientDbId is empty)
     }
 }

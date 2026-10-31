@@ -5,7 +5,7 @@ import { Editor, Node, Extension, mergeAttributes, Document, Paragraph, Text, He
          Plugin, PluginKey, Decoration, DecorationSet } from '/assets/js/vendor/tiptap.js';
 
 // Ingredient fields stored on each ingredient node (mirrors the Ingredient class in recipeData.js)
-const ingredientFields = ['id', 'name', 'ingredientDbId', 'quantity', 'unit', 'unitDbId', 'displayText'];
+const ingredientFields = ['id', 'name', 'ingredientDbId', 'quantity', 'unit', 'unitDbId', 'displayText', 'linkedRecipeId'];
 
 // Inline, non-editable ingredient pill. Deleted and moved as a single unit.
 const IngredientNode = Node.create({

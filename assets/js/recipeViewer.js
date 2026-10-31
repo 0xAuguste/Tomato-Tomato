@@ -32,6 +32,20 @@ function displayAuthor(author, link) {
     }
 }
 
+// Returns a link to the recipe used as an ingredient, or a span if the ingredient isn't a recipe
+function ingredientElement(text, linkedRecipeID) {
+    if (!linkedRecipeID) {
+        const span = document.createElement('span');
+        span.innerText = text;
+        return span;
+    }
+    const a = document.createElement('a');
+    a.href = `/recipe/?id=${encodeURIComponent(linkedRecipeID)}`;
+    a.classList.add('linked-recipe');
+    a.innerText = text;
+    return a;
+}
+
 // Function to load and display recipe data using the db-handler.js helper
 async function loadAndDisplayRecipe(recipeId) {
     try {
@@ -67,12 +81,18 @@ async function loadAndDisplayRecipe(recipeId) {
         const ingredientList = document.getElementById('ingredient-list');
         ingredientList.innerHTML = ''; // Clear existing content
 
+        // Recipes used as ingredients, keyed by frontend ID, so the process can link them too
+        const linkedRecipes = new Map();
+
         if (recipe.ingredients && recipe.ingredients.length > 0) {
             recipe.ingredients.forEach(ingredient => {
                 const li = document.createElement('li');
                 // Use the stored displayText for the list item
-                li.innerText = ingredient.displayText;
+                li.appendChild(ingredientElement(ingredient.displayText, ingredient.linkedRecipeID));
                 ingredientList.appendChild(li);
+                if (ingredient.linkedRecipeID) {
+                    linkedRecipes.set(ingredient.frontendIngredID, ingredient.linkedRecipeID);
+                }
             });
         } else {
             const li = document.createElement('li');
@@ -101,10 +121,9 @@ async function loadAndDisplayRecipe(recipeId) {
                         if (segment.type === 'text') {
                             p.appendChild(document.createTextNode(segment.text));
                         } else if (segment.type === 'ingredient') {
-                            const span = document.createElement('span');
+                            const span = ingredientElement(segment.displayText, linkedRecipes.get(String(segment.id)));
                             span.classList.add('ingredient-text');
                             span.id = segment.id; // Frontend ID
-                            span.innerText = segment.displayText;
                             if (block.content.length === 1) {
                                 span.classList.add('orphan');
                             }
