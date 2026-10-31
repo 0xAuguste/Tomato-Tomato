@@ -45,7 +45,7 @@
             </div>
             <div class="metadata-field user-input">
                 <div class="section-label">Source Link</div>
-                <input type="url" id="recipe-source-link-input" class="user-input" placeholder="https://" autocomplete="off">
+                <input type="url" id="recipe-source-link-input" class="user-input" autocomplete="off">
             </div>
 			<div class="metadata-field user-input">
                 <div class="section-label" onclick="document.getElementById('recipe-cuisine-input').focus()">Cuisine</div>
