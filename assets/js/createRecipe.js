@@ -1,15 +1,19 @@
 // SETUP
 let recipeData = new RecipeData(); // create object to store recipe data to send to backend
 
-// Globals to cache database table options
-let ingredientOptions = [];
-let unitOptions = [];
-let cuisineOptions = [];
-let seasonOptions = [];
-let typeOptions = [];
-let mealOptions = [];
-let sourceOptions = [];
-let ingredientCategoryOptions = [];
+// Cache of database table options for the dropdowns, keyed by table name
+let dropdownOptions = {
+    ingredient: [],
+    unit: [],
+    cuisine: [],
+    season: [],
+    type: [],
+    meal: [],
+    source: [],
+    ingredientCategory: [],
+};
+// Tables whose options are shown alphabetically (the rest keep database order, e.g. seasons)
+const alphabeticalTables = ['ingredient', 'unit', 'cuisine', 'source'];
 
 // Create an event listener on DOMContentLoaded to ensure elements are available
 document.addEventListener('DOMContentLoaded', async () => {
@@ -52,6 +56,7 @@ function closeAddIngredient() {
     document.getElementById('add-ingred-name-input').value = '';
     document.getElementById('add-ingred-name-id').value = '';
     document.getElementById('add-ingred-display').value = '';
+    processEditor.commands.focus(); // Return to where the cursor was in the process
 }
 
 // Toggles display of #create-ingredient-panel
@@ -87,124 +92,40 @@ function closeCreateIngredient() {
     document.getElementById('create-ingred-class-id').value = '';
 }
 
-// Main function to handle text entry into recipe body divs
-function textHandler(e, elem) {
-    if (e.key === "Enter") {
-        e.preventDefault();
-
-        if (e.shiftKey && elem.parentElement.id === "recipe-process") {
-            openAddIngredient();
-        }
-        else {
-            var newParagraph = document.createElement("p");
-            newParagraph.classList.add("recipe-paragraph");
-            newParagraph.setAttribute('contenteditable', 'true');
-            newParagraph.setAttribute('onkeydown', 'textHandler(event, this)');
-            elem.after(newParagraph);
-            newParagraph.focus();
-        }
-    }
-    else if (e.key === "Backspace" || e.key === "Delete") {
-        if (elem.textContent == "" && elem.previousElementSibling !== null) {
-            e.preventDefault();
-            moveCursorToEnd(elem.previousElementSibling);
-            elem.remove();
-        }
-        else if (elem.children.length && elem.children[0].innerText === elem.innerText) {
-            recipeData.removeIngredientByID(elem.children[0].id); // remove ingredient from data
-            elem.children[0].remove(); // remove ingredient text span
-        }
-    }
-    else if (e.key === "#") {
-        e.preventDefault();
-        elem.classList.toggle("section-header");
-    }
-}
-
-function moveCursorToEnd(element) {
-    if (element && element.lastChild) { // Ensure element exists and has content/children
-        const range = document.createRange();
-        const selection = window.getSelection();
-
-        if (element.lastChild.nodeType === Node.TEXT_NODE) {
-            range.setStart(element.lastChild, element.lastChild.length);
-            range.collapse(true); // Collapse to the end
-        } else {
-            // For elements with HTML content or ingredients, select the element's contents
-            // and collapse to the end. This is a more robust approach.
-            range.selectNodeContents(element);
-            range.collapse(false); // 'false' collapses the range to its end point
-        }
-
-        selection.removeAllRanges(); // Clear any existing selections
-        selection.addRange(range);   // Add the new range, placing the cursor
-        element.focus();
-    } else if (element) {
-        // If the element exists but is empty, just focus it
-        element.focus();
-    }
-}
-
-// Handles user clicks in recipe body text divs to allow user to select appropriate <p> tags
-function textBoxClick(e, elem) {
-    if (e.target === elem) {
-        paragraphs = [];
-        for (child of elem.children) {
-            if (child.tagName == "P") {
-                paragraphs.push(child);
-            }
-        }
-        let focus_paragraph = paragraphs.pop()
-        moveCursorToEnd(focus_paragraph);
-    }
-}
-
-// Function to filter options for searchable dropdowns
-async function optionFilter(inputElem, tableName) {
-    let queryString = inputElem.value.toUpperCase();
+// Fills a dropdown list with the given option rows
+function renderDropdownOptions(inputElem, rows) {
     let listContainer = inputElem.nextElementSibling.nextElementSibling; // Get the div.dropdown-list-container
     let list = listContainer.querySelector('.dropdown-list'); // Get the ul.dropdown-list
     let hiddenInput = inputElem.nextElementSibling; // Get the hidden input
 
     list.innerHTML = ""; // Clear old options
+    rows.forEach(row => {
+        let listItem = document.createElement("li");
+        listItem.textContent = row.name; // Display the name (as text, never HTML)
+        listItem.dataset.id = row.id; // Store the ID in a data attribute
+        listItem.classList.add("dropdown-option");
+        // Use mousedown to prevent input from losing focus before click
+        listItem.onmousedown = (e) => {
+            e.preventDefault();
+            selectOption(inputElem, hiddenInput, listItem);
+        };
+        list.append(listItem);
+    });
+    listContainer.style.display = rows.length > 0 ? 'block' : 'none'; // Hide if no options
+}
 
-    let optionsToFilter = [];
-    switch (tableName) {
-        case 'ingredient': optionsToFilter = ingredientOptions; break;
-        case 'unit': optionsToFilter = unitOptions; break;
-        case 'cuisine': optionsToFilter = cuisineOptions; break;
-        case 'season': optionsToFilter = seasonOptions; break;
-        case 'type': optionsToFilter = typeOptions; break;
-        case 'meal': optionsToFilter = mealOptions; break;
-        case 'source': optionsToFilter = sourceOptions; break;
-        case 'ingredientCategory': optionsToFilter = ingredientCategoryOptions; break;
-    }
+// Function to filter options for searchable dropdowns
+function optionFilter(inputElem, tableName) {
+    let queryString = inputElem.value.toUpperCase();
 
-    let filteredOptions = optionsToFilter.filter(row =>
+    let filteredOptions = dropdownOptions[tableName].filter(row =>
         row.name.toUpperCase().includes(queryString)
     );
-
-    if (filteredOptions.length > 0) {
-        filteredOptions.forEach(row => {
-            let listItem = document.createElement("li");
-            listItem.innerHTML = row.name; // Display the name
-            listItem.dataset.id = row.id; // Store the ID in a data attribute
-            listItem.classList.add("dropdown-option");
-            // Use mousedown to prevent input from losing focus before click
-            listItem.onmousedown = (e) => {
-                e.preventDefault();
-                selectOption(inputElem, hiddenInput, listItem);
-            };
-            list.append(listItem);
-        });
-        listContainer.style.display = 'block'; // Show the dropdown list
-    } else {
-        listContainer.style.display = 'none'; // Hide if no matches
-    }
+    renderDropdownOptions(inputElem, filteredOptions);
 
     // If the input is cleared, also clear the hidden ID
     if (queryString === "") {
-        hiddenInput.value = "";
+        inputElem.nextElementSibling.value = "";
     }
 }
 
@@ -217,43 +138,8 @@ function selectOption(inputElem, hiddenInput, listItem) {
 
 // Shows the dropdown list when input is focused, conditionally
 function showDropdown(inputElem, tableName, showAllOnFocus) {
-    let listContainer = inputElem.nextElementSibling.nextElementSibling;
-    let list = listContainer.querySelector('.dropdown-list');
-    let hiddenInput = inputElem.nextElementSibling;
-
-    if (!showAllOnFocus) {
-        list.innerHTML = ""; // Clear any options from previous interactions
-        listContainer.style.display = 'none'; // Ensure it's hidden
-        return; // Do not populate or show on focus if not allowed
-    }
-
-    // Populate with all options if showAllOnFocus is true
-    let optionsToDisplay = [];
-    switch (tableName) {
-        case 'ingredient': optionsToDisplay = ingredientOptions; break;
-        case 'unit': optionsToDisplay = unitOptions; break;
-        case 'cuisine': optionsToDisplay = cuisineOptions; break;
-        case 'season': optionsToDisplay = seasonOptions; break;
-        case 'type': optionsToDisplay = typeOptions; break;
-        case 'meal': optionsToDisplay = mealOptions; break;
-        case 'source': optionsToDisplay = sourceOptions; break;
-        case 'ingredientCategory': optionsToDisplay = ingredientCategoryOptions; break;
-    }
-
-    list.innerHTML = '';
-    optionsToDisplay.forEach(row => {
-        let listItem = document.createElement("li");
-        listItem.innerHTML = row.name;
-        listItem.dataset.id = row.id;
-        listItem.classList.add("dropdown-option");
-        listItem.onmousedown = (e) => {
-            e.preventDefault();
-            selectOption(inputElem, hiddenInput, listItem);
-        };
-        list.append(listItem);
-    });
-
-    listContainer.style.display = 'block'; // Show the dropdown list
+    // Populate with all options if showAllOnFocus is true; otherwise start hidden and empty
+    renderDropdownOptions(inputElem, showAllOnFocus ? dropdownOptions[tableName] : []);
 }
 
 // Hides the dropdown list when input loses focus
@@ -269,13 +155,8 @@ function capitalize(word) {
     return word.charAt(0).toUpperCase()+ word.slice(1);
 }
 
-// Adds ingredient to the recipe
+// Adds ingredient to the recipe at the cursor position in the process editor
 function saveAddIngredient() {
-    // Create ingredient text span
-    let ingredientText = document.createElement("span");
-    ingredientText.setAttribute('contenteditable', 'false');
-    ingredientText.classList.add("ingredient-text");
-    ingredientText.setAttribute('onclick', 'editIngredient(this)');
     let id = Date.now(); // Frontend unique ID
 
     // Get values from the new input fields and hidden IDs
@@ -315,31 +196,11 @@ function saveAddIngredient() {
     }
 
 
-    // Initialize ingredient object
+    // Initialize ingredient object; its data lives on the ingredient node in the editor
     let ingredient = new Ingredient(id, name, ingredientDbId, quantity, unit, unitDbId, displayText);
-    recipeData.addIngredient(ingredient);
 
-    ingredientText.id = id; // Set the ID on the span after validation
-    ingredientText.innerText = displayText;
-
-    let lastParagraph = document.getElementById("recipe-process").lastElementChild;
-    if (isEmpty(lastParagraph)){
-        ingredientText.classList.add("orphan")
-    }
-    
-    lastParagraph.append(ingredientText); // add span to last recipe-paragraph
-
-    closeAddIngredient();
-    moveCursorToEnd(lastParagraph);
-    console.log(recipeData);
-
-    // Clear the input fields after adding ingredient
-    ingredientInput.value = "";
-    ingredientHiddenId.value = "";
-    unitInput.value = "";
-    unitHiddenId.value = "";
-    quantityInput.value = "";
-    displayTextInput.value = "";
+    closeAddIngredient(); // Clears the fields and refocuses the process editor at the saved cursor
+    insertIngredient(ingredient);
 }
 
 // Opens ingredient editor for clicked ingredient
@@ -356,9 +217,10 @@ async function saveRecipe() {
     // Get Recipe Title
     recipeData.name = document.getElementById('recipe-title').value;
 
-    // Parse Description and Process from the DOM into recipeData object
-    recipeData.parseDescription(); // Populates recipeData.description
-    recipeData.parseProcess();     // Populates recipeData.process
+    // Parse Description, Process and Ingredients from the editors into recipeData object
+    recipeData.parseDescription(descriptionEditor); // Populates recipeData.description
+    recipeData.parseProcess(processEditor);         // Populates recipeData.process
+    recipeData.parseIngredients(processEditor);     // Populates recipeData.ingredients
     
     // Get metadata
     recipeData.source = document.getElementById('recipe-source-id').value;
@@ -396,19 +258,7 @@ async function saveRecipe() {
 
 function validRecipe() {
     const recipeTitle = document.getElementById('recipe-title').value.trim();
-    const recipeProcessContainer = document.getElementById('recipe-process');
-    const recipeProcessParagraphs = recipeProcessContainer.querySelectorAll('.recipe-paragraph');
-
-    let isProcessPopulated = false;
-    if (recipeProcessParagraphs.length > 0) {
-        // Check if at least one non-empty paragraph exists in the process
-        for (const paragraph of recipeProcessParagraphs) {
-            // Check for actual text content, ignoring empty paragraphs created by initial setup
-            if (paragraph.textContent.trim() !== "" || paragraph.querySelector('.ingredient-text')) {
-                isProcessPopulated = true;
-            }
-        }
-    }
+    const isProcessPopulated = processEditor.getText().trim() !== ""; // Includes ingredient display text
 
     if (recipeTitle === "") {
         displayMessage("Please enter a recipe title before saving.", 'error');
@@ -416,13 +266,7 @@ function validRecipe() {
         return false;
     } else if (!isProcessPopulated) {
         displayMessage("Please add at least one step to the recipe process before saving.", 'error');
-        // Try to focus on the last paragraph in process if it exists, or the process container
-        const lastProcessParagraph = recipeProcessContainer.querySelector('.recipe-paragraph:last-child');
-        if (lastProcessParagraph) {
-            moveCursorToEnd(lastProcessParagraph);
-        } else {
-            recipeProcessContainer.focus();
-        }
+        processEditor.commands.focus('end');
         return false;
     }
     else {
@@ -450,27 +294,18 @@ function displayMessage(message, type = 'info') {
     }, 3000);
 }
 
-// Function to load all dropdown options into caches and alphabetize on page load
+// Function to load all dropdown options into caches (in parallel) and alphabetize on page load
 async function loadDropdownOptions() {
-    ingredientOptions = await getTableRows('ingredient');
-    ingredientOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+    const tableNames = Object.keys(dropdownOptions);
+    const results = await Promise.all(tableNames.map(tableName => getTableRows(tableName)));
 
-    unitOptions = await getTableRows('unit');
-    unitOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
-
-    cuisineOptions = await getTableRows('cuisine');
-    cuisineOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
-
-    seasonOptions = await getTableRows('season');
-
-    typeOptions = await getTableRows('type');
-
-    mealOptions = await getTableRows('meal');
-
-    sourceOptions = await getTableRows('source');
-    sourceOptions.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
-
-    ingredientCategoryOptions = await getTableRows('ingredientCategory');
+    tableNames.forEach((tableName, i) => {
+        let rows = Array.isArray(results[i]) ? results[i] : []; // Empty tables return a message object
+        if (alphabeticalTables.includes(tableName)) {
+            rows.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+        }
+        dropdownOptions[tableName] = rows;
+    });
 }
 
 // Event handler for adding new metadata options
@@ -486,14 +321,9 @@ async function handleMetadataOptionAddition(event, inputElem, tableName) {
             return;
         }
 
-        let currentOptions = [];
+        let currentOptions = dropdownOptions[tableName];
         let optionExists = false;
         let existingOptionId = null;
-
-        switch (tableName) {
-            case 'cuisine': currentOptions = cuisineOptions; break;
-            case 'source': currentOptions = sourceOptions; break;
-        }
 
         // Check if the option already exists in the local cache (case-insensitive)
         const foundOption = currentOptions.find(option => option.name.toLowerCase() === inputValue.toLowerCase());
@@ -522,11 +352,7 @@ async function handleMetadataOptionAddition(event, inputElem, tableName) {
                     // Check if the item is truly new to the array before pushing
                     const isTrulyNew = !currentOptions.some(option => option.id === newOption.id);
                     if (isTrulyNew) {
-                         // Add to the correct array in JavaScript based on tableName
-                        switch (tableName) {
-                            case 'cuisine': cuisineOptions.push(newOption); break;
-                            case 'source': sourceOptions.push(newOption); break;
-                        }
+                        currentOptions.push(newOption);
                     }
 
                     inputElem.value = newOption.name; // Set the input value to the exact name sent/confirmed
@@ -556,14 +382,14 @@ async function handleIngredientInputKeydown(event) {
         const inputValue = inputElem.value.trim();
 
         // Check if the ingredient exists in the current options
-        const ingredientExists = ingredientOptions.some(option => option.name.toLowerCase() === inputValue.toLowerCase());
+        const ingredientExists = dropdownOptions.ingredient.some(option => option.name.toLowerCase() === inputValue.toLowerCase());
 
         if (inputValue && !ingredientExists) {
             // If the ingredient doesn't exist, open the create ingredient panel
             openCreateIngredient();
         } else if (inputValue && ingredientExists) {
             // If it exists, select it and close the dropdown
-            const selectedOption = ingredientOptions.find(option => option.name.toLowerCase() === inputValue.toLowerCase());
+            const selectedOption = dropdownOptions.ingredient.find(option => option.name.toLowerCase() === inputValue.toLowerCase());
             if (selectedOption) {
                 inputElem.value = selectedOption.name;
                 document.getElementById('add-ingred-name-id').value = selectedOption.id;
@@ -614,8 +440,4 @@ async function saveNewIngredientToDB() {
         console.error('Error saving new ingredient to DB:', error);
         displayMessage(`Error saving new ingredient: ${error.message}`, 'error');
     }
-}
-
-function isEmpty(paragraph) {
-    return paragraph.childNodes.length === 0;
 }

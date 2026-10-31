@@ -52,7 +52,7 @@ input:focus {
     min-height: 1.2em;
     line-height: 1.2;
 }
-.recipe-paragraph:focus {
+.text-entry .ProseMirror { /* Tiptap editor inside the text box */
     outline: none;
 }
 .recipe-paragraph:has(.ingredient-text) {
@@ -178,6 +178,9 @@ input:focus {
     padding: 2px 10px;
     font-weight: 700;
     cursor: pointer;
+}
+.ingredient-text.ProseMirror-selectednode { /* Ingredient selected, e.g. before Backspace deletes it */
+    outline: 2px solid var(--window-trim);
 }
 .orphan {
     margin-left: 2rem;

@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "description": "Build tooling only. The site itself has no build step; run `npm run build:tiptap` after changing Tiptap versions and commit the output.",
+  "scripts": {
+    "build:tiptap": "esbuild tools/tiptap-entry.js --bundle --format=esm --minify --legal-comments=inline --outfile=assets/js/vendor/tiptap.js"
+  },
+  "devDependencies": {
+    "@tiptap/core": "3.32.2",
+    "@tiptap/extension-document": "3.32.2",
+    "@tiptap/extension-heading": "3.32.2",
+    "@tiptap/extension-paragraph": "3.32.2",
+    "@tiptap/extension-text": "3.32.2",
+    "@tiptap/extensions": "3.32.2",
+    "@tiptap/pm": "3.32.2",
+    "esbuild": "0.25.0"
+  }
+}

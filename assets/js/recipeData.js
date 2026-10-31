@@ -12,76 +12,63 @@ class RecipeData {
         this.type = "";
     }
 
-    addIngredient(ingredient) {
-        this.ingredients.push(ingredient);
-    }
-
-    removeIngredientByID(id) {
-        this.ingredients = this.ingredients.filter(ingredient => ingredient.id != id);
-    }
-
-    parseDescription() {
-        const descElements = document.getElementById('recipe-description').children;
+    // Reads paragraphs from the description editor (see recipeEditor.js) as an array of strings
+    parseDescription(editor) {
         const structuredDescription = [];
 
-        for (const element of descElements) {
-            if (element.classList.contains('recipe-paragraph')) {
-                structuredDescription.push(element.innerText);
-            }
-        }
+        editor.state.doc.forEach(block => {
+            structuredDescription.push(block.textContent);
+        });
         this.description = structuredDescription;
     }
 
-    parseProcess() {
-        const processElements = document.getElementById('recipe-process').children;
+    // Reads headers and paragraphs (text + inline ingredients) from the process editor
+    parseProcess(editor) {
         const structuredProcess = [];
 
-        for (const element of processElements) {
-            if (element.classList.contains('section-header')) {
-                structuredProcess.push({ type: 'header', text: element.innerText });
-            } else if (element.classList.contains('recipe-paragraph')) {
+        editor.state.doc.forEach(block => {
+            if (block.type.name === 'heading') {
+                structuredProcess.push({ type: 'header', text: block.textContent });
+            } else if (block.type.name === 'paragraph') {
                 const paragraphContent = [];
-                // Iterate through all child nodes (text nodes and element nodes)
-                for (const node of element.childNodes) {
-                    if (node.nodeType === Node.TEXT_NODE) {
-                        // It's a plain text node
-                        const text = node.textContent; // Get raw text content
-                        if (text.trim()) { // Only add non-empty text (after trimming for storage)
-                            paragraphContent.push({ type: 'text', text: text });
+                block.forEach(node => {
+                    if (node.isText) {
+                        if (node.text.trim()) { // Only add non-empty text
+                            paragraphContent.push({ type: 'text', text: node.text });
                         }
-                    } else if (node.nodeType === Node.ELEMENT_NODE) {
-                        // It's an element node (e.g., <span>)
-                        if (node.classList.contains('ingredient-text')) {
-                            // This is an ingredient span
-                                
-                            paragraphContent.push({
-                                type: 'ingredient',
-                                id: node.id, // Frontend ID
-                                displayText: node.innerText.trim() // The display text
-                            });
-                        } else {
-                                paragraphContent.push({ type: 'text', text: node.innerText.trim() });
-                        }
-                    } else {
-                        // Handle other unexpected elements within the paragraph, treat as text
-                        const text = node.innerText;
-                        if (text.trim()) {
-                            paragraphContent.push({ type: 'text', text: text });
-                        }
+                    } else if (node.type.name === 'ingredient') {
+                        paragraphContent.push({
+                            type: 'ingredient',
+                            id: node.attrs.id, // Frontend ID
+                            displayText: node.attrs.displayText
+                        });
                     }
-                }
+                });
                 if (paragraphContent.length > 0) {
-                structuredProcess.push({ type: 'paragraph', content: paragraphContent });
+                    structuredProcess.push({ type: 'paragraph', content: paragraphContent });
                 }
             }
-        }
+        });
         this.process = structuredProcess;
+    }
+
+    // Collects the ingredients present in the process editor, so deleted ingredients are never saved
+    parseIngredients(editor) {
+        const ingredientsByID = new Map(); // Keyed by frontend ID, so a copy-pasted ingredient is saved once
+
+        editor.state.doc.descendants(node => {
+            if (node.type.name === 'ingredient' && !ingredientsByID.has(node.attrs.id)) {
+                const a = node.attrs;
+                ingredientsByID.set(a.id, new Ingredient(a.id, a.name, a.ingredientDbId, a.quantity, a.unit, a.unitDbId, a.displayText));
+            }
+        });
+        this.ingredients = [...ingredientsByID.values()];
     }
 }
 
 class Ingredient {
     constructor(id, name, ingredientDbId, quantity, unit, unitDbId, displayText) {
-        this.id = id; // Frontend unique ID (Date.now())
+        this.id = id; // Frontend unique ID (Date.now()), links process segments to recipe_ingredients rows
         this.name = name; // Display name
         this.quantity = quantity;
         this.unit = unit; // Display unit

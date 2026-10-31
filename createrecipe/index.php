@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
 	<link href="/assets/css/main-v1.0.css" type="text/css" rel="stylesheet">
-	<link href="/assets/css/recipe-creator-v1.0.css" type="text/css" rel="stylesheet">
+	<link href="/assets/css/recipe-creator-v1.1.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<?php
@@ -21,15 +21,12 @@
 		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" autocomplete="off">
 
 		<h4 class="section-label">Description</h4>
-		<div name="recipe-description" id="recipe-description" class="user-input text-entry" onclick="textBoxClick(event, this)">
-			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
-		</div>
-		
+		<!-- Description and Process editors are created by recipeEditor.js -->
+		<div name="recipe-description" id="recipe-description" class="user-input text-entry"></div>
+
 		<h4 class="section-label">Process</h4>
-		<div name="recipe-process" id="recipe-process" class="user-input text-entry" onclick="textBoxClick(event, this)">
-			<p class="recipe-paragraph" contenteditable="true" onkeydown="textHandler(event, this)"></p>
-		</div>
-		<p id="shift-note"><b>Shift + Return</b> to add an ingredient</p>
+		<div name="recipe-process" id="recipe-process" class="user-input text-entry"></div>
+		<p id="shift-note"><b>Shift + Return</b> to add an ingredient &nbsp;·&nbsp; <b>#</b> to toggle a section header</p>
 
 		<h4 class="section-label">Other Optional Info</h4>
 		<div id="recipe-metadata-bottom">
@@ -159,5 +156,6 @@
 	<script src="/assets/js/db-handler.js"></script>
 	<script src="/assets/js/recipeData.js"></script>
 	<script src="/assets/js/createRecipe.js"></script>
+	<script type="module" src="/assets/js/recipeEditor.js"></script>
 </body>
 </html>
