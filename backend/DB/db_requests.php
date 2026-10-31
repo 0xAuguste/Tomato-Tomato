@@ -12,7 +12,8 @@ try {
 
 }
 catch (PDOException $e) {
-    echo json_encode(["error" => "Connection failed: " . $e->getMessage()]);
+    error_log("Connection failed: " . $e->getMessage()); // Details stay in the server log
+    echo json_encode(["error" => "Connection failed."]);
     exit;
 }
 
@@ -40,7 +41,8 @@ if (in_array($table, $validTables)) {
         }
     }
     catch (PDOException $e) {
-        echo json_encode(["error" => "Error executing query: " . $e->getMessage()]);
+        error_log("Error executing query: " . $e->getMessage()); // Details stay in the server log
+        echo json_encode(["error" => "Error executing query."]);
     }
 }
 else {

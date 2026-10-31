@@ -56,7 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC); // Fetch as associative array by default
     } catch (PDOException $e) {
         http_response_code(500); // Internal Server Error
-        echo json_encode(["message" => "Connection failed: " . $e->getMessage()]);
+        error_log("Connection failed: " . $e->getMessage()); // Details stay in the server log
+        echo json_encode(["message" => "Connection failed."]);
         exit();
     }
 
@@ -174,7 +175,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $pdo->rollBack(); // Rollback on error to ensure data consistency
         // Send error response
         http_response_code(500); // Internal Server Error
-        echo json_encode(["message" => "Error saving recipe: " . $e->getMessage()]);
+        error_log("Error saving recipe: " . $e->getMessage()); // Details stay in the server log
+        echo json_encode(["message" => "Error saving recipe."]);
     }
 
 } else {
