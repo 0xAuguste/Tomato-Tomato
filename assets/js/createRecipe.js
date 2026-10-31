@@ -283,7 +283,7 @@ async function saveRecipe() {
         displayMessage(response.message, 'success');
     } catch (error) {
         console.error("Failed to save recipe:", error);
-        displayMessage("Error saving recipe. Check console for details.", 'error');
+        displayMessage(error.loggedOut ? error.message : "Error saving recipe. Check console for details.", 'error');
     }
 }
 
@@ -429,7 +429,7 @@ async function handleMetadataOptionAddition(event, inputElem, tableName) {
                 }
             } catch (error) {
                 console.error(`Error adding new ${tableName} option:`, error);
-                displayMessage(`Error adding new ${tableName} option.`, 'error');
+                displayMessage(error.loggedOut ? error.message : `Error adding new ${tableName} option.`, 'error');
             }
         }
     }

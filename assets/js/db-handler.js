@@ -22,6 +22,15 @@ async function getTableRows(table) {
     }
 }
 
+// Throws a readable error if the session expired, so the editor can say so without losing work
+function checkLoggedIn(response) {
+    if (response.status === 401) {
+        const error = new Error("You've been logged out. Log in again in another tab, then retry.");
+        error.loggedOut = true;
+        throw error;
+    }
+}
+
 /// Function to add a new ingredient to the database of given name and category
 async function addNewIngredientEntry(name, category) {
     let path = '/backend/DB/new_ingredient.php';
@@ -38,6 +47,7 @@ async function addNewIngredientEntry(name, category) {
             })
         });
 
+        checkLoggedIn(response);
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
@@ -67,6 +77,7 @@ async function addNewMetadataOptionEntry(name, tableName) {
             })
         });
 
+        checkLoggedIn(response);
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
@@ -93,6 +104,7 @@ async function saveRecipeEntry(recipeDataPayload) {
             body: JSON.stringify(recipeDataPayload) // Send the entire recipe object as JSON
         });
 
+        checkLoggedIn(response);
         if (!response.ok) {
             // If the response is not OK (e.g., 404, 500), throw an error
             const errorText = await response.text(); // Get response body for more details

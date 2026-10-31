@@ -1,0 +1,51 @@
+/* Styling for login page */
+
+#recipe-body {
+    width: min(90%, 400px);
+    background-color: var(--aix-door);
+    border-radius: 8px;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.08);
+    margin: 3rem auto 2rem;
+    padding: 3rem 2rem;
+    box-sizing: border-box;
+}
+#login-form {
+    display: flex;
+    flex-direction: column;
+}
+#login-form input {
+    margin-bottom: 1.5rem;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    color: var(--chalkboard);
+    background-color: var(--cream);
+    border: none;
+    border-radius: 5px;
+    outline: 2px solid var(--light-fava);
+    transition: outline 0.3s ease;
+}
+#login-form input:focus {
+    outline: 2px solid var(--dark-fava);
+}
+#login-error {
+    margin: -0.5rem 0 1.5rem;
+    color: tomato;
+    text-align: center;
+}
+#login-button {
+    align-self: center;
+    padding: 10px 20px;
+    background-color: var(--light-fava);
+    color: var(--offwhite);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+#login-button:hover {
+    background-color: var(--dark-fava);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+}

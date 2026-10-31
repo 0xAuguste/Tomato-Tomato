@@ -1,3 +1,9 @@
+<?php
+define('__ROOT__', dirname(dirname(__FILE__)));
+
+require_once(__ROOT__.'/backend/auth/session.php');
+isLoggedIn(); // Starts the session before any output, so the header can show Log Out
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,8 +17,6 @@
 </head>
 <body>
 	<?php
-	define('__ROOT__', dirname(dirname(__FILE__)));
-
 	require_once(__ROOT__.'/backend/utils/printers.php');
 	printHeader();
 	?>
