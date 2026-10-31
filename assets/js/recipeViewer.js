@@ -40,7 +40,7 @@ async function loadAndDisplayRecipe(recipeId) {
 
         // Display basic recipe info
         document.getElementById('recipe-title').innerText = recipe.name || 'Untitled Recipe';
-        document.getElementById('recipe-yield').innerText = recipe.yield ? `Makes: ${recipe.yield}` : '';
+        document.getElementById('recipe-yield').innerText = recipe.yield ? `Makes ${recipe.yield}` : '';
         document.getElementById('recipe-yield').style.display = recipe.yield ? 'block' : 'none'; // hide if empty
         displayAuthor(recipe.source, recipe.sourceLink);
         document.getElementById('recipe-metadata').style.display = (!recipe.source && !recipe.yield) ? 'none' : 'flex';

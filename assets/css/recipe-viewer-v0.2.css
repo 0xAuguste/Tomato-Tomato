@@ -5,7 +5,7 @@
 }
 #recipe-title {
     font-size: 2.7rem;
-    padding: 2rem 0;
+    padding: 2rem 0 0.75rem;
     margin: 0 auto;
 }
 #recipe-metadata {
@@ -20,6 +20,9 @@
 #recipe-yield {
     text-align: right;
 }
+#recipe-yield:not(:empty) + #recipe-source:not(:empty) { /* Rule between yield and author, only when both are shown */
+    border-left: 1px solid var(--chalkboard);
+}
 #recipe-source a {
     color: inherit;
     text-decoration: underline;
@@ -31,6 +34,16 @@
 }
 .recipe-section {
     margin: 2.5rem auto;
+}
+#recipe-process {
+    margin-top: 3rem;
+}
+#recipe-process::before { /* Short centered rule above the process, shown whether or not there's a description */
+    content: '';
+    display: block;
+    width: 30%;
+    margin: 0 auto 3rem;
+    border-top: 1px solid var(--chalkboard);
 }
 #recipe-ingredients {
     display: none;
