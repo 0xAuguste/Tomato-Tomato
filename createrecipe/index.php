@@ -131,7 +131,7 @@
 					<input type="text" name="add-ingred-display" id="add-ingred-display" autocomplete="off">
 				</div>
 			</div>
-			<button type="submit" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
+			<button type="submit" id="save-ingredient-button" onclick="saveAddIngredient()">Add Ingredient to Recipe</button>
 
 			<div id="create-ingredient-panel" class="ingredient-panel">
 				<div class="add-ingred-field dropdown-container">

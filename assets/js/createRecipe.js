@@ -14,6 +14,8 @@ let dropdownOptions = {
 };
 // Tables whose options are shown alphabetically (the rest keep database order, e.g. seasons)
 const alphabeticalTables = ['ingredient', 'unit', 'cuisine', 'source'];
+// Frontend ID of the ingredient being edited in the add-ingredient panel, or null when adding a new one
+let editingIngredientId = null;
 
 // Create an event listener on DOMContentLoaded to ensure elements are available
 document.addEventListener('DOMContentLoaded', async () => {
@@ -56,6 +58,8 @@ function closeAddIngredient() {
     document.getElementById('add-ingred-name-input').value = '';
     document.getElementById('add-ingred-name-id').value = '';
     document.getElementById('add-ingred-display').value = '';
+    editingIngredientId = null; // Next open of the panel adds a new ingredient
+    document.getElementById('save-ingredient-button').innerText = 'Add Ingredient to Recipe';
     processEditor.commands.focus(); // Return to where the cursor was in the process
 }
 
@@ -197,15 +201,31 @@ function saveAddIngredient() {
 
 
     // Initialize ingredient object; its data lives on the ingredient node in the editor
-    let ingredient = new Ingredient(id, name, ingredientDbId, quantity, unit, unitDbId, displayText);
+    const isEdit = editingIngredientId !== null;
+    let ingredient = new Ingredient(isEdit ? editingIngredientId : id, name, ingredientDbId, quantity, unit, unitDbId, displayText);
 
     closeAddIngredient(); // Clears the fields and refocuses the process editor at the saved cursor
-    insertIngredient(ingredient);
+    if (isEdit) {
+        updateIngredient(ingredient);
+    } else {
+        insertIngredient(ingredient);
+    }
 }
 
-// Opens ingredient editor for clicked ingredient
+// Opens the add-ingredient panel pre-filled with the clicked ingredient; saving updates it in place
 function editIngredient(ingred) {
-    // Future functionality to edit an ingredient
+    const data = ingred.dataset; // Attributes rendered by the ingredient node in recipeEditor.js
+    editingIngredientId = data.id;
+
+    document.getElementById('add-ingred-quantity').value = data.quantity ?? '';
+    document.getElementById('add-ingred-unit-input').value = data.unit ?? '';
+    document.getElementById('add-ingred-unit-id').value = data.unitDbId ?? '';
+    document.getElementById('add-ingred-name-input').value = data.name ?? '';
+    document.getElementById('add-ingred-name-id').value = data.ingredientDbId ?? '';
+    document.getElementById('add-ingred-display').value = data.displayText ?? '';
+    document.getElementById('save-ingredient-button').innerText = 'Update Ingredient';
+
+    openAddIngredient();
 }
 
 // Saves the entire recipe to the database
