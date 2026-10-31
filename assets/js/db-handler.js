@@ -1,7 +1,7 @@
 // Function to return all rows of given table,  with 'id' and 'name'
 async function getTableRows(table) {
     let valid_tables = ['ingredient', 'ingredientCategory', 'cuisine', 'meal', 'recipe', 'season',
-                        'source', 'type', 'unit']; // List of allowed tables
+                        'source', 'type', 'unit', 'recipeIngredient']; // List of allowed tables (recipeIngredient = recipes listed as ingredients)
 
     if (valid_tables.includes(table)) { // user entered valid table name
         let request = `/backend/DB/db_requests.php?table=${table}`;

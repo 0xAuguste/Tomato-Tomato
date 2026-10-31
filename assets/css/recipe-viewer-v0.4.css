@@ -51,6 +51,15 @@
 .ingredient-text {
     font-weight: 1000;
 }
+.linked-recipe { /* A recipe used as an ingredient, styled like the author link */
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--light-fava);
+    text-underline-offset: 3px;
+}
+.linked-recipe:hover {
+    color: var(--dark-fava);
+}
 .orphan {
     margin-left: 2rem;
 }

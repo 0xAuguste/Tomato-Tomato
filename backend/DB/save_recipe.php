@@ -46,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $mealID = isset($input['mealID']) ? $input['mealID'] : null;
     $seasonID = isset($input['seasonID']) ? $input['seasonID'] : null;
     $typeID = isset($input['typeID']) ? $input['typeID'] : null;
+    $listAsIngredient = !empty($input['listAsIngredient']) ? 1 : 0; // Show this recipe in the ingredient dropdown
 
     // Connect to the database with a new PDO:
     try {
@@ -67,8 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $newRecipeID = generate_uuid_v4();
 
         // Prepare the INSERT statement for the recipe table
-        $sql_recipe = "INSERT INTO recipe (id, name, description, process, yield) 
-                       VALUES (:id, :name, :description, :process, :yield)";
+        $sql_recipe = "INSERT INTO recipe (id, name, description, process, yield, listAsIngredient)
+                       VALUES (:id, :name, :description, :process, :yield, :listAsIngredient)";
         $stmt_recipe = $pdo->prepare($sql_recipe);
 
         // Bind parameters for recipe table
@@ -77,21 +78,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt_recipe->bindParam(':description', $recipeDescription);
         $stmt_recipe->bindParam(':process', $recipeProcess);
         $stmt_recipe->bindParam(':yield', $recipeYield);
+        $stmt_recipe->bindParam(':listAsIngredient', $listAsIngredient, PDO::PARAM_INT);
         $stmt_recipe->execute();
 
         // Prepare the INSERT statement for recipe_ingredients table
-        $sql_recipe_ingredient = "INSERT INTO recipe_ingredients (id, recipeID, ingredientID, frontendIngredID, quantity, unitID, displayText)
-                                  VALUES (:id, :recipeID, :ingredientID, :frontendIngredID, :quantity, :unitID, :displayText)";
+        $sql_recipe_ingredient = "INSERT INTO recipe_ingredients (id, recipeID, ingredientID, linkedRecipeID, frontendIngredID, quantity, unitID, displayText)
+                                  VALUES (:id, :recipeID, :ingredientID, :linkedRecipeID, :frontendIngredID, :quantity, :unitID, :displayText)";
         $stmt_recipe_ingredient = $pdo->prepare($sql_recipe_ingredient);
 
-        // Insert ingredients
+        // Insert ingredients. Each one is either an ingredient or another recipe used as an ingredient.
         foreach ($recipeIngredients as $ingredient) {
-            if (isset($ingredient['ingredientDbId'])) {
+            $ingredientDbId = !empty($ingredient['ingredientDbId']) ? $ingredient['ingredientDbId'] : null;
+            $linkedRecipeId = !empty($ingredient['linkedRecipeId']) ? $ingredient['linkedRecipeId'] : null;
+            if ($ingredientDbId || $linkedRecipeId) {
                 $recipeIngredID = generate_uuid_v4();
 
                 $stmt_recipe_ingredient->bindParam(':id', $recipeIngredID);
                 $stmt_recipe_ingredient->bindParam(':recipeID', $newRecipeID);
-                $stmt_recipe_ingredient->bindParam(':ingredientID', $ingredient['ingredientDbId']);
+                $stmt_recipe_ingredient->bindParam(':ingredientID', $ingredientDbId);
+                $stmt_recipe_ingredient->bindParam(':linkedRecipeID', $linkedRecipeId);
                 $stmt_recipe_ingredient->bindParam(':frontendIngredID', $ingredient['id']);
                 $stmt_recipe_ingredient->bindParam(':quantity', $ingredient['quantity']);
                 $stmt_recipe_ingredient->bindParam(':unitID', $ingredient['unitDbId']);
@@ -99,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 $stmt_recipe_ingredient->execute();
             } else {
-                error_log("Ingredient missing database ID for recipe ID: {$newRecipeID}. Frontend ID was '{$ingredient['id']}'. Skipping this ingredient for recipe_ingredients table.");
+                error_log("Ingredient missing database ID and linked recipe ID for recipe ID: {$newRecipeID}. Frontend ID was '{$ingredient['id']}'. Skipping this ingredient for recipe_ingredients table.");
             }
         }
 

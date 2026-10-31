@@ -11,6 +11,7 @@ let dropdownOptions = {
     meal: [],
     source: [],
     ingredientCategory: [],
+    recipeIngredient: [], // Recipes listed as ingredients; also merged into the ingredient options
 };
 // Tables whose options are shown alphabetically (the rest keep database order, e.g. seasons)
 const alphabeticalTables = ['ingredient', 'unit', 'cuisine', 'source'];
@@ -104,6 +105,9 @@ function renderDropdownOptions(inputElem, rows) {
         listItem.textContent = row.name; // Display the name (as text, never HTML)
         listItem.dataset.id = row.id; // Store the ID in a data attribute
         listItem.classList.add("dropdown-option");
+        if (row.isRecipe) {
+            listItem.classList.add("recipe-option"); // A recipe used as an ingredient
+        }
         // Use mousedown to prevent input from losing focus before click
         listItem.onmousedown = (e) => {
             e.preventDefault();
@@ -167,14 +171,17 @@ function saveAddIngredient() {
     let quantityInput = document.getElementById("add-ingred-quantity");
     let displayTextInput = document.getElementById("add-ingred-display");
     let name = ingredientInput.value; // Display name from the input
-    let ingredientDbId = ingredientHiddenId.value; // Actual DB ID from hidden input
+    let selectedId = ingredientHiddenId.value; // Actual DB ID from hidden input: an ingredient or a recipe
+    let isRecipe = dropdownOptions.recipeIngredient.some(row => row.id === selectedId);
+    let ingredientDbId = isRecipe ? "" : selectedId;
+    let linkedRecipeId = isRecipe ? selectedId : "";
     let quantity = quantityInput.value;
     let unit = unitInput.value; // Display unit from the input
     let unitDbId = unitHiddenId.value; // Actual DB ID from hidden input
     let displayText = displayTextInput.value;
 
     // Basic validation for selected ingredient/unit
-    if (!ingredientDbId) {
+    if (!selectedId) {
         displayMessage("Please select an ingredient from the dropdown.", 'error');
         ingredientInput.focus();
         return;
@@ -197,7 +204,7 @@ function saveAddIngredient() {
 
 
     // Initialize ingredient object; its data lives on the ingredient node in the editor
-    let ingredient = new Ingredient(id, name, ingredientDbId, quantity, unit, unitDbId, displayText);
+    let ingredient = new Ingredient(id, name, ingredientDbId, quantity, unit, unitDbId, displayText, linkedRecipeId);
 
     closeAddIngredient(); // Clears the fields and refocuses the process editor at the saved cursor
     insertIngredient(ingredient);
@@ -230,6 +237,7 @@ async function saveRecipe() {
     recipeData.season = document.getElementById('recipe-season-id').value;
     recipeData.type = document.getElementById('recipe-type-id').value;
     recipeData.meal = document.getElementById('recipe-meal-id').value;
+    recipeData.listAsIngredient = document.getElementById('recipe-list-as-ingredient').checked;
 
     // Prepare data for backend. Stringify arrays as PHP expects JSON strings.
     const recipePayload = {
@@ -244,6 +252,7 @@ async function saveRecipe() {
         ...(recipeData.season.length > 0 ? { seasonID: recipeData.season} : {}),
         ...(recipeData.meal.length > 0 ? { mealID: recipeData.meal} : {}),
         ...(recipeData.type.length > 0 ? { typeID: recipeData.type} : {}),
+        listAsIngredient: recipeData.listAsIngredient,
     };
 
     // Send data to PHP backend using the helper function from db-handler.js
@@ -334,6 +343,11 @@ async function loadDropdownOptions() {
         }
         dropdownOptions[tableName] = rows;
     });
+
+    // Show recipes listed as ingredients in the ingredient dropdown, flagged so they're styled differently
+    dropdownOptions.recipeIngredient.forEach(row => row.isRecipe = true);
+    dropdownOptions.ingredient = [...dropdownOptions.ingredient, ...dropdownOptions.recipeIngredient]
+        .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // Event handler for adding new metadata options
