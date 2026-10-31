@@ -6,6 +6,7 @@ function startSession() {
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }
+    ini_set('session.gc_maxlifetime', 7200); // 2 hours idle, since typing in the editor doesn't reach the server
     session_set_cookie_params([
         'lifetime' => 0, // Until the browser closes
         'path' => '/',
