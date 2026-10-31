@@ -1,0 +1,25 @@
+/* Styling for recipe index page */
+
+#recipe-body {
+    margin: 3rem auto 4rem;
+}
+#recipe-title {
+    font-size: 2.7rem;
+    padding: 2rem 0;
+    margin: 0 auto;
+}
+#recipe-list {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+#recipe-list li {
+    margin: 0.8rem 0;
+    font-size: 1.4rem;
+}
+#recipe-list a {
+    color: var(--chalkboard);
+}
+#recipe-list a:hover {
+    color: var(--dark-fava);
+}
