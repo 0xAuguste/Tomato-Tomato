@@ -18,13 +18,17 @@ catch (PDOException $e) {
 
 $table = isset($_GET['table']) ? $_GET['table'] : null;
 $validTables = ['ingredient', 'ingredientCategory', 'cuisine', 'meal', 'recipe', 'season',
-                'source', 'type', 'unit'];
+                'source', 'type', 'unit', 'recipeIngredient'];
 
 // Query database if table is valid:
 if (in_array($table, $validTables)) {
     try {
         // Always select both 'id' and 'name'
-        $sql = "SELECT id, name FROM $table"; // Updated to select both columns
+        if ($table === 'recipeIngredient') {
+            $sql = "SELECT id, name FROM recipe WHERE listAsIngredient = 1"; // Recipes that can be used as ingredients
+        } else {
+            $sql = "SELECT id, name FROM $table"; // Updated to select both columns
+        }
         $sth = $pdo->prepare($sql);
         $sth->execute();
         $rows = $sth->fetchAll(); // PDO::FETCH_ASSOC is default now
