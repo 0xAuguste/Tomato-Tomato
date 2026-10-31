@@ -119,7 +119,7 @@ input:focus {
 
 .ingredient-panel input,
 .ingredient-panel select { /* Kept select in case it's used elsewhere in this panel */
-    border: 1px solid var(--dark-fava);
+    border: 1px solid var(--chalkboard);
     border-radius: 5px;
     padding: 8px;
     width: 100%;
@@ -255,7 +255,7 @@ input:focus {
 
 #recipe-metadata-bottom input,
 #recipe-metadata-bottom .dropdown-input {
-    border: none;
+    border: 1px solid var(--chalkboard);
     border-radius: 5px;
     padding: 8px;
     width: 100%;
@@ -299,7 +299,6 @@ input:focus {
     right: 0;
     z-index: 10; /* Ensure it appears above other elements */
     background-color: var(--offwhite);
-    border: 1px solid var(--dark-fava);
     border-radius: 5px;
     max-height: 200px; /* Limit height and make it scrollable */
     overflow-y: auto;
