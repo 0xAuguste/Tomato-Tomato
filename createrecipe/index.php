@@ -88,9 +88,9 @@
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>
             </div>
-            <div class="metadata-field user-input">
+            <div class="metadata-field user-input checkbox-field">
                 <!-- Checked recipes show up in the ingredient dropdown -->
-                <label class="section-label" for="recipe-list-as-ingredient">List recipe as ingredient?</label>
+                <label class="section-label" for="recipe-list-as-ingredient">List as ingredient?</label>
                 <input type="checkbox" id="recipe-list-as-ingredient">
             </div>
         </div>
