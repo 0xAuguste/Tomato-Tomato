@@ -26,7 +26,7 @@
 
 		<h4 class="section-label">Process</h4>
 		<div name="recipe-process" id="recipe-process" class="user-input text-entry"></div>
-		<p id="shift-note"><b>Shift + Return</b> to add an ingredient &nbsp;·&nbsp; <b># + Space</b> for a section header</p>
+		<p id="shift-note"><b>Shift + Return</b> to add an ingredient &nbsp;·&nbsp; <b>#</b> to toggle a section header</p>
 
 		<h4 class="section-label">Other Optional Info</h4>
 		<div id="recipe-metadata-bottom">

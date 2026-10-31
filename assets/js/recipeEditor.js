@@ -40,7 +40,8 @@ const IngredientNode = Node.create({
         return node.attrs.displayText;
     },
 
-    // Mark ingredients that sit alone in a paragraph as .orphan (same rule as recipeViewer.js)
+    // Mark ingredients that sit alone in a paragraph as .orphan. Whitespace-only text is ignored,
+    // matching how recipeData.js saves paragraphs and how recipeViewer.js applies .orphan
     addProseMirrorPlugins() {
         return [new Plugin({
             key: new PluginKey('orphanIngredient'),
@@ -48,8 +49,18 @@ const IngredientNode = Node.create({
                 decorations(state) {
                     const decorations = [];
                     state.doc.descendants((node, pos) => {
-                        if (node.type.name === 'paragraph' && node.childCount === 1 && node.firstChild.type.name === 'ingredient') {
-                            decorations.push(Decoration.node(pos + 1, pos + 1 + node.firstChild.nodeSize, { class: 'orphan' }));
+                        if (node.type.name !== 'paragraph') {
+                            return;
+                        }
+                        const segments = [];
+                        node.forEach((child, offset) => {
+                            if (!child.isText || child.text.trim()) {
+                                segments.push({ child, offset });
+                            }
+                        });
+                        if (segments.length === 1 && segments[0].child.type.name === 'ingredient') {
+                            const from = pos + 1 + segments[0].offset;
+                            decorations.push(Decoration.node(from, from + segments[0].child.nodeSize, { class: 'orphan' }));
                         }
                     });
                     return DecorationSet.create(state.doc, decorations);
@@ -59,11 +70,16 @@ const IngredientNode = Node.create({
     },
 });
 
-// Shift + Enter opens the add-ingredient panel; the ingredient is inserted at the cursor on save
-const AddIngredientShortcut = Extension.create({
-    name: 'addIngredientShortcut',
+// Keyboard shortcuts for the process editor
+const ProcessShortcuts = Extension.create({
+    name: 'processShortcuts',
     addKeyboardShortcuts() {
-        return { 'Shift-Enter': () => { openAddIngredient(); return true; } };
+        return {
+            // Opens the add-ingredient panel; the ingredient is inserted at the cursor on save
+            'Shift-Enter': () => { openAddIngredient(); return true; },
+            // Toggles the current line between section header and body text
+            '#': () => this.editor.commands.toggleHeading({ level: 1 }),
+        };
     },
 });
 
@@ -89,14 +105,23 @@ window.descriptionEditor = createEditor(document.getElementById('recipe-descript
 
 window.processEditor = createEditor(document.getElementById('recipe-process'), [
     ...baseExtensions,
-    Heading.configure({ levels: [1], HTMLAttributes: { class: 'recipe-paragraph section-header' } }), // "# " at line start
+    Heading.configure({ levels: [1], HTMLAttributes: { class: 'recipe-paragraph section-header' } }), // Toggled with "#"
     IngredientNode,
-    AddIngredientShortcut,
+    ProcessShortcuts,
 ]);
 
 // Inserts an Ingredient (from recipeData.js) at the process editor's cursor
 window.insertIngredient = function (ingredient) {
     const attrs = {};
     ingredientFields.forEach(field => attrs[field] = String(ingredient[field]));
-    processEditor.chain().focus().insertContent({ type: 'ingredient', attrs }).run();
+
+    // Follow the ingredient with a space (unless whitespace already follows) so the cursor lands in
+    // plain text; browsers draw a cursor placed directly after an uneditable span inside the span
+    const { $from } = processEditor.state.selection;
+    const nextChar = $from.parent.textBetween($from.parentOffset, Math.min($from.parentOffset + 1, $from.parent.content.size), '', '￼');
+    const content = [{ type: 'ingredient', attrs }];
+    if (!/^\s/.test(nextChar)) {
+        content.push({ type: 'text', text: ' ' });
+    }
+    processEditor.chain().focus().insertContent(content).run();
 };
