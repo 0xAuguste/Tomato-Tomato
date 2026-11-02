@@ -58,11 +58,19 @@ try {
     $stmt_ingredients->execute();
     $ingredients = $stmt_ingredients->fetchAll();
 
-    $sql_source = "SELECT s.name, rs.link FROM recipe_sources rs JOIN source s ON rs.sourceID = s.id WHERE rs.recipeID = :recipeID";
+    // Authors, alphabetically (recipe_sources has no order column)
+    $sql_source = "SELECT s.name, rs.link FROM recipe_sources rs JOIN source s ON rs.sourceID = s.id WHERE rs.recipeID = :recipeID ORDER BY s.name";
     $stmt_source = $pdo->prepare($sql_source);
     $stmt_source->bindParam(':recipeID', $recipeID);
     $stmt_source->execute();
-    $source = $stmt_source->fetch(); // Author name and link
+    $sources = $stmt_source->fetchAll();
+    $sourceLink = null; // The same link is stored with every author
+    foreach ($sources as $source) {
+        if ($source['link']) {
+            $sourceLink = $source['link'];
+            break;
+        }
+    }
 
     $sql_cuisine = "SELECT c.name FROM recipe_cuisines rc JOIN cuisine c ON rc.cuisineID = c.id WHERE rc.recipeID = :recipeID";
     $stmt_cuisine = $pdo->prepare($sql_cuisine);
@@ -97,8 +105,8 @@ try {
         'process' => json_decode($recipe['process'], true),
         'yield' => $recipe['yield'],
         'ingredients' => $ingredients,
-        'source' => $source ? $source['name'] : null,
-        'sourceLink' => $source && $source['link'] ? $source['link'] : null,
+        'sources' => array_column($sources, 'name'), // Author names
+        'sourceLink' => $sourceLink,
         'cuisine' => $cuisine,
         'meal' => $meal,
         'season' => $season,

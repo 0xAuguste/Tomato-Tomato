@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // var_dump($recipeIngredients);
 
     $recipeYield = isset($input['yield']) ? $input['yield'] : null;
-    $sourceID = isset($input['sourceID']) ? $input['sourceID'] : null; // Author
+    $sourceIDs = isset($input['sourceIDs']) && is_array($input['sourceIDs']) ? array_values(array_unique(array_filter($input['sourceIDs'], 'is_string'))) : []; // Authors
     $sourceLink = isset($input['sourceLink']) ? $input['sourceLink'] : '';
     if ($sourceLink !== '' && !preg_match('#^https?://#i', $sourceLink)) {
         http_response_code(400); // Only web links, so the recipe page never renders e.g. a javascript: link
@@ -113,16 +113,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        // Insert into recipe_sources (author and source link)
-        if ($sourceID) {
+        // Insert into recipe_sources, one row per author. The recipe's one source link is stored on every row.
+        if ($sourceIDs) {
             $sql_recipe_source = "INSERT INTO recipe_sources (id, recipeID, sourceID, link) VALUES (:id, :recipeID, :sourceID, :link)";
             $stmt_recipe_source = $pdo->prepare($sql_recipe_source);
-            $recipeSourceID = generate_uuid_v4();
-            $stmt_recipe_source->bindParam(':id', $recipeSourceID);
-            $stmt_recipe_source->bindParam(':recipeID', $newRecipeID);
-            $stmt_recipe_source->bindParam(':sourceID', $sourceID);
-            $stmt_recipe_source->bindParam(':link', $sourceLink);
-            $stmt_recipe_source->execute();
+            foreach ($sourceIDs as $sourceID) {
+                $recipeSourceID = generate_uuid_v4();
+                $stmt_recipe_source->bindParam(':id', $recipeSourceID);
+                $stmt_recipe_source->bindParam(':recipeID', $newRecipeID);
+                $stmt_recipe_source->bindParam(':sourceID', $sourceID);
+                $stmt_recipe_source->bindParam(':link', $sourceLink);
+                $stmt_recipe_source->execute();
+            }
         }
 
         // Insert into recipe_cuisines

@@ -13,7 +13,7 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
 	<link href="/assets/css/main-v1.1.css" type="text/css" rel="stylesheet">
-	<link href="/assets/css/recipe-creator-v1.3.css" type="text/css" rel="stylesheet">
+	<link href="/assets/css/recipe-creator-v1.4.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<?php
@@ -40,12 +40,13 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
             </div>
             <div class="metadata-field user-input">
                 <div class="section-label">Author</div>
-                <!-- Authors are stored in the source table -->
+                <!-- Authors are stored in the source table. Picked authors are kept in selectedOptions.source (createRecipe.js) and shown below -->
                 <div class="dropdown-container">
-                    <input type="text" id="recipe-source-input" class="dropdown-input" autocomplete="off" onkeyup="optionFilter(this, 'source')" onblur="hideDropdown(this)">
+                    <input type="text" id="recipe-source-input" class="dropdown-input" autocomplete="off" data-multiselect="source" onkeyup="optionFilter(this, 'source')" onblur="hideDropdown(this)">
                     <input type="hidden" id="recipe-source-id">
                     <div class="dropdown-list-container"><ul class="dropdown-list"></ul></div>
                 </div>
+                <div class="selected-options"></div>
             </div>
             <div class="metadata-field user-input">
                 <div class="section-label">Source Link</div>

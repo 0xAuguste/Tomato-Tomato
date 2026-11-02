@@ -15,6 +15,10 @@ let dropdownOptions = {
 };
 // Tables whose options are shown alphabetically (the rest keep database order, e.g. seasons)
 const alphabeticalTables = ['ingredient', 'unit', 'cuisine', 'source'];
+// Options picked in multiselect dropdowns (inputs with data-multiselect="tableName"), keyed by table name
+let selectedOptions = {
+    source: [], // Authors
+};
 // Frontend ID of the ingredient being edited in the add-ingredient panel, or null when adding a new one
 let editingIngredientId = null;
 
@@ -102,6 +106,10 @@ function renderDropdownOptions(inputElem, rows) {
     let listContainer = inputElem.nextElementSibling.nextElementSibling; // Get the div.dropdown-list-container
     let list = listContainer.querySelector('.dropdown-list'); // Get the ul.dropdown-list
     let hiddenInput = inputElem.nextElementSibling; // Get the hidden input
+    let picked = selectedOptions[inputElem.dataset.multiselect];
+    if (picked) {
+        rows = rows.filter(row => !picked.some(option => option.id === row.id)); // Hide options already picked
+    }
 
     list.innerHTML = ""; // Clear old options
     rows.forEach(row => {
@@ -139,9 +147,49 @@ function optionFilter(inputElem, tableName) {
 
 // Handles selection of an option from the searchable dropdown list
 function selectOption(inputElem, hiddenInput, listItem) {
-    inputElem.value = listItem.innerText;
-    hiddenInput.value = listItem.dataset.id;
+    if (inputElem.dataset.multiselect) {
+        addSelectedOption(inputElem, { id: listItem.dataset.id, name: listItem.innerText });
+    } else {
+        inputElem.value = listItem.innerText;
+        hiddenInput.value = listItem.dataset.id;
+    }
     inputElem.nextElementSibling.nextElementSibling.style.display = 'none'; // Hide the dropdown list
+}
+
+// Adds an option to a multiselect's picked options and clears the input for the next one
+function addSelectedOption(inputElem, row) {
+    const picked = selectedOptions[inputElem.dataset.multiselect];
+    if (!picked.some(option => option.id === row.id)) {
+        picked.push({ id: row.id, name: row.name });
+    }
+    inputElem.value = '';
+    renderSelectedOptions(inputElem);
+}
+
+// Removes an option from a multiselect's picked options
+function removeSelectedOption(inputElem, id) {
+    const tableName = inputElem.dataset.multiselect;
+    selectedOptions[tableName] = selectedOptions[tableName].filter(option => option.id !== id);
+    renderSelectedOptions(inputElem);
+}
+
+// Shows a multiselect's picked options as removable pills below its dropdown
+function renderSelectedOptions(inputElem) {
+    const container = inputElem.parentElement.nextElementSibling; // Get the div.selected-options
+    container.innerHTML = ''; // Clear old pills
+    selectedOptions[inputElem.dataset.multiselect].forEach(option => {
+        const pill = document.createElement('span');
+        pill.classList.add('selected-option');
+        pill.textContent = option.name; // As text, never HTML
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.classList.add('remove-option');
+        removeButton.innerHTML = '&times;';
+        removeButton.setAttribute('aria-label', `Remove ${option.name}`);
+        removeButton.onclick = () => removeSelectedOption(inputElem, option.id);
+        pill.append(removeButton);
+        container.append(pill);
+    });
 }
 
 // Shows the dropdown list when input is focused, conditionally
@@ -250,7 +298,7 @@ async function saveRecipe() {
     recipeData.parseIngredients(processEditor);     // Populates recipeData.ingredients
     
     // Get metadata
-    recipeData.source = document.getElementById('recipe-source-id').value;
+    recipeData.sources = selectedOptions.source.map(option => option.id);
     recipeData.sourceLink = normalizeLink(document.getElementById('recipe-source-link-input').value);
     recipeData.yield = document.getElementById('recipe-yield-input').value;
     recipeData.cuisine = document.getElementById('recipe-cuisine-id').value;
@@ -265,7 +313,7 @@ async function saveRecipe() {
         description: JSON.stringify(recipeData.description),
         process: JSON.stringify(recipeData.process),
         ingredients: JSON.stringify(recipeData.ingredients), // This will contain frontend IDs and DB IDs
-        ...(recipeData.source.length > 0 ? { sourceID: recipeData.source} : {}),
+        ...(recipeData.sources.length > 0 ? { sourceIDs: recipeData.sources} : {}),
         ...(recipeData.sourceLink.length > 0 ? { sourceLink: recipeData.sourceLink} : {}),
         ...(recipeData.yield.length > 0 ? { yield: recipeData.yield} : {}),
         ...(recipeData.cuisine.length > 0 ? { cuisineID: recipeData.cuisine} : {}),
@@ -304,7 +352,7 @@ function validRecipe() {
         displayMessage("Please enter a valid source link.", 'error');
         sourceLinkInput.focus();
         return false;
-    } else if (sourceLinkInput.value.trim() !== "" && !document.getElementById('recipe-source-id').value) {
+    } else if (sourceLinkInput.value.trim() !== "" && selectedOptions.source.length === 0) {
         displayMessage("Please choose an author for the source link.", 'error'); // Links are stored with the author
         document.getElementById('recipe-source-input').focus();
         return false;
@@ -397,8 +445,12 @@ async function handleMetadataOptionAddition(event, inputElem, tableName) {
 
         if (optionExists) {
             // If it exists locally, ensure the hidden ID is set correctly
-            inputElem.value = foundOption.name; // Use the exact name from the cache
-            hiddenInput.value = existingOptionId;
+            if (inputElem.dataset.multiselect) {
+                addSelectedOption(inputElem, foundOption);
+            } else {
+                inputElem.value = foundOption.name; // Use the exact name from the cache
+                hiddenInput.value = existingOptionId;
+            }
             displayMessage(`"${inputValue}" already exists.`, 'info');
             // Hide the dropdown list as an option has been selected/confirmed
             inputElem.nextElementSibling.nextElementSibling.style.display = 'none';
@@ -417,8 +469,12 @@ async function handleMetadataOptionAddition(event, inputElem, tableName) {
                         currentOptions.push(newOption);
                     }
 
-                    inputElem.value = newOption.name; // Set the input value to the exact name sent/confirmed
-                    hiddenInput.value = newOption.id; // Set the hidden ID
+                    if (inputElem.dataset.multiselect) {
+                        addSelectedOption(inputElem, newOption);
+                    } else {
+                        inputElem.value = newOption.name; // Set the input value to the exact name sent/confirmed
+                        hiddenInput.value = newOption.id; // Set the hidden ID
+                    }
 
                     displayMessage(response.message, 'success');
                     // Re-render the dropdown list to include the newly added item
