@@ -1,6 +1,16 @@
 let allRecipes = []; // Every recipe, sorted by name (filled by loadRecipeList)
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const searchInput = document.getElementById('recipe-search');
+    searchInput.value = new URLSearchParams(window.location.search).get('q') || ''; // Restore a search from the URL
+    searchInput.addEventListener('input', applySearch);
+    searchInput.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            searchInput.value = '';
+            applySearch();
+        }
+    });
+
     await loadRecipeList();
 });
 
@@ -16,7 +26,35 @@ async function loadRecipeList() {
 
     recipes.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
     allRecipes = recipes;
-    renderRecipeList(allRecipes);
+    applySearch();
+}
+
+// Lowercases and strips accents, so "creme" matches "Crème"
+function normalizeText(text) {
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+// Function to show only the recipes matching the search box, and keep the search in the URL (?q=)
+function applySearch() {
+    const query = document.getElementById('recipe-search').value.trim();
+
+    const url = new URL(window.location.href);
+    if (query) {
+        url.searchParams.set('q', query);
+    } else {
+        url.searchParams.delete('q');
+    }
+    history.replaceState(null, '', url);
+
+    if (allRecipes.length === 0) return; // Still loading, or there are no recipes ("No recipes yet." is already shown)
+
+    // Every word must appear somewhere in the name, in any order
+    const words = normalizeText(query).split(/\s+/).filter(Boolean);
+    const matches = allRecipes.filter(recipe => {
+        const name = normalizeText(recipe.name);
+        return words.every(word => name.includes(word));
+    });
+    renderRecipeList(matches, "No recipes match.");
 }
 
 // Function to display recipes as links to the recipe viewer (and, when logged in, the editor)
