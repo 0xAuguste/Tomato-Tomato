@@ -41,8 +41,8 @@ $loggedIn = isLoggedIn(); // Starts the session before any output, so the header
 		<ul id="recipe-list"<?php if ($loggedIn) echo ' data-logged-in'; ?>></ul>
 	</div>
 
-	<script src="/assets/js/db-handler.js"></script>
-	<script src="/assets/js/tagFilter.js"></script>
-	<script src="/assets/js/recipeIndex.js"></script>
+	<script src="/assets/js/db-handler.js?v=1"></script>
+	<script src="/assets/js/tagFilter.js?v=1"></script>
+	<script src="/assets/js/recipeIndex.js?v=1"></script>
 </body>
 </html>
