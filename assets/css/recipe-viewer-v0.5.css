@@ -69,6 +69,10 @@
 .section-header {
     margin-top: 1.5rem;
 }
+.recipe-list { /* Matches the list indent in the creator */
+    margin: 5px 0;
+    padding-left: 1.5em;
+}
 
 @media (max-width: 700px) {
     #recipe-body {

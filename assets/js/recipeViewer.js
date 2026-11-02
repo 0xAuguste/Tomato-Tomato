@@ -49,6 +49,24 @@ function ingredientElement(text, linkedRecipeID) {
     return a;
 }
 
+// Returns a process paragraph built from its text and ingredient segments. linkedRecipes maps
+// ingredient frontend IDs to the recipes they link to
+function processParagraph(segments, linkedRecipes) {
+    const p = document.createElement('p');
+    p.classList.add('recipe-paragraph');
+    segments.forEach(segment => {
+        if (segment.type === 'text') {
+            p.appendChild(document.createTextNode(segment.text));
+        } else if (segment.type === 'ingredient') {
+            const span = ingredientElement(segment.displayText, linkedRecipes.get(String(segment.id)));
+            span.classList.add('ingredient-text');
+            span.id = segment.id; // Frontend ID
+            p.appendChild(span);
+        }
+    });
+    return p;
+}
+
 // Function to load and display recipe data using the db-handler.js helper
 async function loadAndDisplayRecipe(recipeId) {
     try {
@@ -118,22 +136,24 @@ async function loadAndDisplayRecipe(recipeId) {
                     header.innerText = block.text;
                     processDiv.appendChild(header);
                 } else if (block.type === 'paragraph') {
-                    const p = document.createElement('p');
-                    p.classList.add('recipe-paragraph');
-                    block.content.forEach(segment => {
-                        if (segment.type === 'text') {
-                            p.appendChild(document.createTextNode(segment.text));
-                        } else if (segment.type === 'ingredient') {
-                            const span = ingredientElement(segment.displayText, linkedRecipes.get(String(segment.id)));
-                            span.classList.add('ingredient-text');
-                            span.id = segment.id; // Frontend ID
-                            if (block.content.length === 1) {
-                                span.classList.add('orphan');
-                            }
-                            p.appendChild(span);
-                        }
-                    });
+                    const p = processParagraph(block.content, linkedRecipes);
+                    if (block.content.length === 1 && block.content[0].type === 'ingredient') {
+                        p.firstChild.classList.add('orphan');
+                    }
                     processDiv.appendChild(p);
+                } else if (block.type === 'list') {
+                    // Flat list of paragraphs, as written in the editor (recipeEditor.js)
+                    const list = document.createElement(block.ordered ? 'ol' : 'ul');
+                    list.classList.add('recipe-list');
+                    if (block.ordered && block.start) {
+                        list.start = block.start;
+                    }
+                    block.items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.appendChild(processParagraph(item, linkedRecipes));
+                        list.appendChild(li);
+                    });
+                    processDiv.appendChild(list);
                 }
             });
         } else {
