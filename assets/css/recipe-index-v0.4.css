@@ -200,4 +200,11 @@
     #recipe-body { /* Keep the search bar near the top on small screens */
         margin-top: 3rem;
     }
+    #filter-toggle { /* Caret only; the text stays for screen readers */
+        font-size: 0;
+    }
+    #filter-toggle::after {
+        font-size: 0.85rem;
+        margin-left: 0;
+    }
 }
