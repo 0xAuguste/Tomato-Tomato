@@ -119,6 +119,32 @@ async function saveRecipeEntry(recipeDataPayload) {
     }
 }
 
+// Function to delete a recipe from the database given an ID
+async function deleteRecipeEntry(recipeId) {
+    const path = '/backend/DB/delete_recipe.php';
+
+    try {
+        const response = await fetch(path, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: recipeId })
+        });
+
+        checkLoggedIn(response);
+        const responseJson = await response.json();
+        if (!response.ok) {
+            // The message says why, e.g. which recipes still use this one as an ingredient
+            throw new Error(responseJson.message || `HTTP error! status: ${response.status}`);
+        }
+        return responseJson;
+    } catch (error) {
+        console.error('Error deleting recipe:', error);
+        throw error;
+    }
+}
+
 // Function to grab a recipe from the database given an ID
 async function getRecipeById(recipeId) {
     const path = `/backend/DB/get_recipe.php?id=${recipeId}`;
