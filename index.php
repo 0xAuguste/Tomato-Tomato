@@ -25,9 +25,17 @@ $loggedIn = isLoggedIn(); // Starts the session before any output, so the header
 		<h1 id="recipe-title">Recipes</h1>
 		<!-- Filters the list as you type or pick tags (recipeIndex.js) -->
 		<div id="recipe-filters">
-			<input type="search" id="recipe-search" placeholder="Search recipes" aria-label="Search recipes" autocomplete="off">
-			<div id="tag-filters"></div> <!-- One dropdown per category (tagFilter.js) -->
-			<div id="filter-pills"></div> <!-- Picked tags from every dropdown -->
+			<div id="search-bar">
+				<label for="recipe-search" id="search-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+				</label>
+				<input type="search" id="recipe-search" aria-label="Search recipes" autocomplete="off">
+				<button type="button" id="filter-toggle" aria-expanded="false" aria-controls="filter-panel">Add filters</button>
+			</div>
+			<div id="filter-panel" hidden>
+				<div id="tag-filters"></div> <!-- One dropdown per category (tagFilter.js) -->
+			</div>
+			<div id="filter-pills"></div> <!-- Picked tags from every dropdown, shown even while the filters are hidden -->
 		</div>
 		<!-- Logged-in users get an edit link next to each recipe (recipeIndex.js) -->
 		<ul id="recipe-list"<?php if ($loggedIn) echo ' data-logged-in'; ?>></ul>

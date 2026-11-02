@@ -13,6 +13,13 @@
     padding: 0;
     text-align: center;
 }
+#recipe-list::before { /* Short centered rule above the recipes, like the recipe viewer's */
+    content: '';
+    display: block;
+    width: 30%;
+    margin: 0 auto 2rem;
+    border-top: 1px solid var(--chalkboard);
+}
 #recipe-list li {
     margin: 0.8rem 0;
     font-size: 1.4rem;
@@ -48,26 +55,65 @@
     justify-content: center;
     gap: 5px;
     margin-top: 10px;
+    min-height: 1.8rem; /* Room for a row of pills even when empty, so the recipes don't jump when one is added */
 }
-#filter-pills:not(:has(.tag-filter-pill)) { /* No picks yet */
-    display: none;
+/* Search bar: magnifying glass, search box, and the "Add filters" toggle, inside one border */
+#search-bar {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    background-color: var(--offwhite);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+#search-icon {
+    display: flex;
+    padding: 0 4px 0 12px;
+    color: var(--chalkboard-light);
+    cursor: text;
 }
 #recipe-search {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px 12px;
-    border: 1px solid var(--chalkboard-light);
-    border-radius: 5px;
+    flex: 1;
+    min-width: 0; /* Lets the box shrink on narrow screens */
+    padding: 8px;
+    border: none;
     font-family: 'EB Garamond', serif;
     font-size: 1.2rem;
-    text-align: center;
-    background-color: var(--offwhite);
+    background: none;
     color: var(--chalkboard);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
 }
 #recipe-search:focus {
     outline: none;
-    border-color: var(--dark-fava);
+}
+#filter-toggle {
+    align-self: stretch;
+    padding: 0 14px;
+    border: none;
+    border-radius: 0 4px 4px 0; /* Follows the search bar's rounded corners */
+    background-color: var(--aix-door); /* The recipe creator's background */
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    color: var(--chalkboard-light);
+    white-space: nowrap;
+    cursor: pointer;
+}
+#filter-toggle:hover,
+#filter-toggle[aria-expanded="true"] {
+    color: var(--dark-fava);
+}
+#filter-toggle::after { /* Down caret, flipped up while the filters are shown */
+    content: "";
+    display: inline-block;
+    width: 0.35em;
+    height: 0.35em;
+    margin: 0 0 0.2em 0.5em;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    vertical-align: middle;
+}
+#filter-toggle[aria-expanded="true"]::after {
+    margin-bottom: -0.1em;
+    transform: rotate(-135deg);
 }
 
 /* Searchable multiselect filters (tagFilter.js) */
@@ -78,17 +124,28 @@
     width: 100%;
     box-sizing: border-box;
     padding: 6px 10px;
-    border: 1px solid var(--chalkboard-light);
-    border-radius: 5px;
-    font-family: 'EB Garamond', serif;
-    font-size: 1.05rem;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
     text-align: center;
-    background-color: var(--offwhite);
+    background: none;
     color: var(--chalkboard);
+    cursor: pointer; /* Reads as a button until you're typing in it */
+}
+.tag-filter-input::placeholder {
+    color: var(--chalkboard-light);
 }
 .tag-filter-input:focus {
     outline: none;
-    border-color: var(--dark-fava);
+}
+.tag-filter-input:focus:not(:placeholder-shown) { /* Typing */
+    cursor: text;
+}
+.tag-filter-input:focus::placeholder { /* Shows which filter you're in */
+    color: var(--dark-fava);
+}
+.tag-filter-input:placeholder-shown { /* No caret blinking inside the centred label until you type */
+    caret-color: transparent;
 }
 .tag-filter-list {
     position: absolute;

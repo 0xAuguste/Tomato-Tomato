@@ -23,6 +23,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // "Add filters" shows and hides the filter dropdowns
+    const filterToggle = document.getElementById('filter-toggle');
+    filterToggle.addEventListener('click', () => {
+        const filterPanel = document.getElementById('filter-panel');
+        filterPanel.hidden = !filterPanel.hidden;
+        filterToggle.setAttribute('aria-expanded', String(!filterPanel.hidden));
+        filterToggle.innerText = filterPanel.hidden ? 'Add filters' : 'Hide filters';
+    });
+
     await loadRecipeList();
 });
 
