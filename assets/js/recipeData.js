@@ -33,9 +33,11 @@ class RecipeData {
                 structuredProcess.push({ type: 'header', text: block.textContent });
             } else if (block.type.name === 'paragraph') {
                 const paragraphContent = [];
-                block.forEach(node => {
+                block.forEach((node, offset, index) => {
                     if (node.isText) {
-                        if (node.text.trim()) { // Only add non-empty text
+                        // Skip whitespace-only text, except between two ingredients so they don't run together
+                        const betweenIngredients = index > 0 && index < block.childCount - 1;
+                        if (node.text.trim() || betweenIngredients) {
                             paragraphContent.push({ type: 'text', text: node.text });
                         }
                     } else if (node.type.name === 'ingredient') {
