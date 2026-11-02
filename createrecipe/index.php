@@ -173,9 +173,9 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
 		</div>
 	</div>
 
-	<script src="/assets/js/db-handler.js"></script>
-	<script src="/assets/js/recipeData.js"></script>
-	<script src="/assets/js/createRecipe.js"></script>
-	<script type="module" src="/assets/js/recipeEditor.js"></script>
+	<script src="/assets/js/db-handler.js?v=1"></script>
+	<script src="/assets/js/recipeData.js?v=1"></script>
+	<script src="/assets/js/createRecipe.js?v=1"></script>
+	<script type="module" src="/assets/js/recipeEditor.js?v=1"></script>
 </body>
 </html>
