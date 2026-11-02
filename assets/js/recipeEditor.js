@@ -2,7 +2,8 @@
 // Loaded as a module; exposes descriptionEditor, processEditor, insertIngredient(), updateIngredient() and setRecipeContent() on window
 // so the classic scripts (createRecipe.js, recipeData.js) can use them.
 import { Editor, Node, Extension, mergeAttributes, Document, Paragraph, Text, Heading, UndoRedo,
-         Plugin, PluginKey, Decoration, DecorationSet } from '/assets/js/vendor/tiptap.js';
+         BulletList, OrderedList, ListItem,
+         Plugin, PluginKey, Decoration, DecorationSet } from '/assets/js/vendor/tiptap.js?v=2';
 
 // Ingredient fields stored on each ingredient node (mirrors the Ingredient class in recipeData.js)
 const ingredientFields = ['id', 'name', 'ingredientDbId', 'quantity', 'unit', 'unitDbId', 'displayText', 'linkedRecipeId'];
@@ -40,15 +41,15 @@ const IngredientNode = Node.create({
         return node.attrs.displayText;
     },
 
-    // Mark ingredients that sit alone in a paragraph as .orphan. Whitespace-only text is ignored,
-    // matching how recipeData.js saves paragraphs and how recipeViewer.js applies .orphan
+    // Mark ingredients that sit alone in a top-level paragraph (not a list item) as .orphan. Whitespace-only
+    // text is ignored, matching how recipeData.js saves paragraphs and how recipeViewer.js applies .orphan
     addProseMirrorPlugins() {
         return [new Plugin({
             key: new PluginKey('orphanIngredient'),
             props: {
                 decorations(state) {
                     const decorations = [];
-                    state.doc.descendants((node, pos) => {
+                    state.doc.forEach((node, pos) => {
                         if (node.type.name !== 'paragraph') {
                             return;
                         }
@@ -70,6 +71,14 @@ const IngredientNode = Node.create({
     },
 });
 
+// List item holding a single paragraph, so lists stay flat. Drops the Tab / Shift-Tab nesting shortcuts
+const FlatListItem = ListItem.extend({
+    content: 'paragraph',
+    addKeyboardShortcuts() {
+        return { Enter: () => this.editor.commands.splitListItem(this.name) };
+    },
+});
+
 // Keyboard shortcuts for the process editor
 const ProcessShortcuts = Extension.create({
     name: 'processShortcuts',
@@ -77,8 +86,8 @@ const ProcessShortcuts = Extension.create({
         return {
             // Opens the add-ingredient panel; the ingredient is inserted at the cursor on save
             'Shift-Enter': () => { openAddIngredient(); return true; },
-            // Toggles the current line between section header and body text
-            '#': () => this.editor.commands.toggleHeading({ level: 1 }),
+            // Toggles the current line between section header and body text; typed as-is inside lists
+            '#': () => !this.editor.isActive('listItem') && this.editor.commands.toggleHeading({ level: 1 }),
         };
     },
 });
@@ -106,6 +115,9 @@ window.descriptionEditor = createEditor(document.getElementById('recipe-descript
 window.processEditor = createEditor(document.getElementById('recipe-process'), [
     ...baseExtensions,
     Heading.configure({ levels: [1], HTMLAttributes: { class: 'recipe-paragraph section-header' } }), // Toggled with "#"
+    BulletList.configure({ HTMLAttributes: { class: 'recipe-list' } }),  // Started by typing "- " or "* "
+    OrderedList.configure({ HTMLAttributes: { class: 'recipe-list' } }), // Started by typing "1. "
+    FlatListItem,
     IngredientNode,
     ProcessShortcuts,
 ]);
@@ -152,19 +164,29 @@ window.setRecipeContent = function (description, process, ingredients) {
     const textContent = text => text ? [{ type: 'text', text }] : [];
     const doc = blocks => ({ type: 'doc', content: blocks.length ? blocks : [{ type: 'paragraph' }] });
 
+    // A paragraph of text and ingredient segments
+    const paragraph = segments => ({
+        type: 'paragraph',
+        content: segments.map(segment => segment.type === 'ingredient'
+            // An ingredient without a saved row (e.g. its recipe was deleted) keeps just its display text
+            ? { type: 'ingredient', attrs: ingredientAttrs(ingredients.get(String(segment.id)) ?? { id: segment.id, displayText: segment.displayText }) }
+            : { type: 'text', text: segment.text }),
+    });
+
     const descriptionBlocks = (description || []).map(text => ({ type: 'paragraph', content: textContent(text) }));
 
     const processBlocks = (process || []).map(block => {
         if (block.type === 'header') {
             return { type: 'heading', attrs: { level: 1 }, content: textContent(block.text) };
         }
-        return {
-            type: 'paragraph',
-            content: block.content.map(segment => segment.type === 'ingredient'
-                // An ingredient without a saved row (e.g. its recipe was deleted) keeps just its display text
-                ? { type: 'ingredient', attrs: ingredientAttrs(ingredients.get(String(segment.id)) ?? { id: segment.id, displayText: segment.displayText }) }
-                : { type: 'text', text: segment.text }),
-        };
+        if (block.type === 'list') {
+            return {
+                type: block.ordered ? 'orderedList' : 'bulletList',
+                attrs: block.ordered ? { start: block.start ?? 1 } : {},
+                content: block.items.map(item => ({ type: 'listItem', content: [paragraph(item)] })),
+            };
+        }
+        return paragraph(block.content);
     });
 
     descriptionEditor.chain().setMeta('addToHistory', false).setContent(doc(descriptionBlocks)).run();

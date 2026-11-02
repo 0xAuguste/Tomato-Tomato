@@ -16,8 +16,17 @@ try {
     exit;
 }
 
-// Flattens a stored process (JSON headers and paragraphs of text and ingredients) into plain text,
-// using each ingredient's display text, as the viewer shows it
+// Flattens a paragraph's text and ingredient segments into one line, using each ingredient's display text
+function segmentsText($segments) {
+    $pieces = [];
+    foreach ($segments as $piece) {
+        $pieces[] = ($piece['type'] ?? '') === 'ingredient' ? ($piece['displayText'] ?? '') : ($piece['text'] ?? '');
+    }
+    return implode(' ', $pieces); // Spaced so an ingredient never runs into the next word
+}
+
+// Flattens a stored process (JSON headers, paragraphs and lists of text and ingredients) into plain text,
+// using each ingredient's display text, as the viewer shows it. Each list item becomes its own line
 function processText($processJson) {
     $blocks = json_decode($processJson, true);
     if (!is_array($blocks)) return "";
@@ -27,11 +36,11 @@ function processText($processJson) {
         if (($block['type'] ?? '') === 'header') {
             $lines[] = $block['text'] ?? '';
         } elseif (($block['type'] ?? '') === 'paragraph' && is_array($block['content'] ?? null)) {
-            $pieces = [];
-            foreach ($block['content'] as $piece) {
-                $pieces[] = ($piece['type'] ?? '') === 'ingredient' ? ($piece['displayText'] ?? '') : ($piece['text'] ?? '');
+            $lines[] = segmentsText($block['content']);
+        } elseif (($block['type'] ?? '') === 'list' && is_array($block['items'] ?? null)) {
+            foreach ($block['items'] as $item) {
+                if (is_array($item)) $lines[] = segmentsText($item);
             }
-            $lines[] = implode(' ', $pieces); // Spaced so an ingredient never runs into the next word
         }
     }
     return trim(implode("\n", $lines));

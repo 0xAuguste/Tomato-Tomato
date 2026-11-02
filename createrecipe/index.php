@@ -13,7 +13,7 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
 	<link href="/assets/css/main-v1.1.css" type="text/css" rel="stylesheet">
-	<link href="/assets/css/recipe-creator-v1.5.css" type="text/css" rel="stylesheet">
+	<link href="/assets/css/recipe-creator-v1.6.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<?php
@@ -174,8 +174,8 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
 	</div>
 
 	<script src="/assets/js/db-handler.js?v=1"></script>
-	<script src="/assets/js/recipeData.js?v=1"></script>
+	<script src="/assets/js/recipeData.js?v=2"></script>
 	<script src="/assets/js/createRecipe.js?v=1"></script>
-	<script type="module" src="/assets/js/recipeEditor.js?v=1"></script>
+	<script type="module" src="/assets/js/recipeEditor.js?v=2"></script>
 </body>
 </html>

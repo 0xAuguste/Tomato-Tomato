@@ -58,6 +58,10 @@ input:focus {
 .recipe-paragraph:has(.ingredient-text) {
     margin: 10px 0;
 }
+.recipe-list {
+    margin: 5px 0;
+    padding-left: 1.5em;
+}
 #add-ingredient-panel {
     display: none;
     position: fixed;

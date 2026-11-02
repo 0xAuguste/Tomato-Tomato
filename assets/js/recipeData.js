@@ -24,7 +24,7 @@ class RecipeData {
         this.description = structuredDescription;
     }
 
-    // Reads headers and paragraphs (text + inline ingredients) from the process editor
+    // Reads headers, paragraphs and lists (text + inline ingredients) from the process editor
     parseProcess(editor) {
         const structuredProcess = [];
 
@@ -32,28 +32,50 @@ class RecipeData {
             if (block.type.name === 'heading') {
                 structuredProcess.push({ type: 'header', text: block.textContent });
             } else if (block.type.name === 'paragraph') {
-                const paragraphContent = [];
-                block.forEach((node, offset, index) => {
-                    if (node.isText) {
-                        // Skip whitespace-only text, except between two ingredients so they don't run together
-                        const betweenIngredients = index > 0 && index < block.childCount - 1;
-                        if (node.text.trim() || betweenIngredients) {
-                            paragraphContent.push({ type: 'text', text: node.text });
-                        }
-                    } else if (node.type.name === 'ingredient') {
-                        paragraphContent.push({
-                            type: 'ingredient',
-                            id: node.attrs.id, // Frontend ID
-                            displayText: node.attrs.displayText
-                        });
-                    }
-                });
+                const paragraphContent = this.parseParagraph(block);
                 if (paragraphContent.length > 0) {
                     structuredProcess.push({ type: 'paragraph', content: paragraphContent });
+                }
+            } else if (block.type.name === 'bulletList' || block.type.name === 'orderedList') {
+                // Each list item holds one paragraph (lists are flat, see recipeEditor.js); empty items are dropped
+                const items = [];
+                block.forEach(item => {
+                    const itemContent = this.parseParagraph(item.firstChild);
+                    if (itemContent.length > 0) {
+                        items.push(itemContent);
+                    }
+                });
+                if (items.length > 0) {
+                    const list = { type: 'list', ordered: block.type.name === 'orderedList', items };
+                    if (list.ordered) {
+                        list.start = block.attrs.start;
+                    }
+                    structuredProcess.push(list);
                 }
             }
         });
         this.process = structuredProcess;
+    }
+
+    // Reads a paragraph node as an array of text and ingredient segments
+    parseParagraph(paragraph) {
+        const paragraphContent = [];
+        paragraph.forEach((node, offset, index) => {
+            if (node.isText) {
+                // Skip whitespace-only text, except between two ingredients so they don't run together
+                const betweenIngredients = index > 0 && index < paragraph.childCount - 1;
+                if (node.text.trim() || betweenIngredients) {
+                    paragraphContent.push({ type: 'text', text: node.text });
+                }
+            } else if (node.type.name === 'ingredient') {
+                paragraphContent.push({
+                    type: 'ingredient',
+                    id: node.attrs.id, // Frontend ID
+                    displayText: node.attrs.displayText
+                });
+            }
+        });
+        return paragraphContent;
     }
 
     // Collects the ingredients present in the process editor, so deleted ingredients are never saved
