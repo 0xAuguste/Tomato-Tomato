@@ -16,17 +16,39 @@ try {
     exit;
 }
 
+// Flattens a stored process (JSON headers and paragraphs of text and ingredients) into plain text,
+// using each ingredient's display text, as the viewer shows it
+function processText($processJson) {
+    $blocks = json_decode($processJson, true);
+    if (!is_array($blocks)) return "";
+
+    $lines = [];
+    foreach ($blocks as $block) {
+        if (($block['type'] ?? '') === 'header') {
+            $lines[] = $block['text'] ?? '';
+        } elseif (($block['type'] ?? '') === 'paragraph' && is_array($block['content'] ?? null)) {
+            $pieces = [];
+            foreach ($block['content'] as $piece) {
+                $pieces[] = ($piece['type'] ?? '') === 'ingredient' ? ($piece['displayText'] ?? '') : ($piece['text'] ?? '');
+            }
+            $lines[] = implode(' ', $pieces); // Spaced so an ingredient never runs into the next word
+        }
+    }
+    return trim(implode("\n", $lines));
+}
+
 // Returns every recipe with the IDs it can be searched and filtered by, plus the options in use for each filter:
-// { "recipes": [{ id, name, description, sources: [ids], cuisines, meals, seasons, types, ingredients }],
+// { "recipes": [{ id, name, description, process, sources: [ids], cuisines, meals, seasons, types, ingredients }],
 //   "options": { "sources": [{ id, name }], "cuisines", "meals", "seasons", "types", "ingredients" } }
 try {
     $recipes = [];
-    foreach ($pdo->query("SELECT id, name, description FROM recipe ORDER BY name") as $row) {
+    foreach ($pdo->query("SELECT id, name, description, process FROM recipe ORDER BY name") as $row) {
         $paragraphs = json_decode($row['description'], true); // Stored as a JSON array of paragraphs
         $recipes[$row['id']] = [
             "id" => $row['id'],
             "name" => $row['name'],
             "description" => is_array($paragraphs) ? trim(implode("\n", $paragraphs)) : "",
+            "process" => processText($row['process']),
             "sources" => [], "cuisines" => [], "meals" => [], "seasons" => [], "types" => [], "ingredients" => []
         ];
     }

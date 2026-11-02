@@ -29,6 +29,11 @@ async function loadRecipeList() {
         return;
     }
 
+    // What the search box matches against: the name, description, and process
+    recipeIndex.recipes.forEach(recipe => {
+        recipe.searchText = normalizeText([recipe.name, recipe.description, recipe.process].join(' '));
+    });
+
     allRecipes = recipeIndex.recipes.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
     applySearch();
 }
@@ -52,12 +57,9 @@ function applySearch() {
 
     if (allRecipes.length === 0) return; // Still loading, or there are no recipes ("No recipes yet." is already shown)
 
-    // Every word must appear somewhere in the name, in any order
+    // Every word must appear somewhere in the recipe's search text, in any order
     const words = normalizeText(query).split(/\s+/).filter(Boolean);
-    const matches = allRecipes.filter(recipe => {
-        const name = normalizeText(recipe.name);
-        return words.every(word => name.includes(word));
-    });
+    const matches = allRecipes.filter(recipe => words.every(word => recipe.searchText.includes(word)));
     renderRecipeList(matches, "No recipes match.");
 }
 
