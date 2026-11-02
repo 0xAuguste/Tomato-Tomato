@@ -1,24 +1,27 @@
 /* Styling for recipe index page */
 
-#recipe-body {
-    margin: 3rem auto 4rem;
+body { /* Page fills the screen, so only the recipe list scrolls */
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
 }
-#recipe-title {
-    font-size: 2.7rem;
-    padding: 2rem 0;
-    margin: 0 auto;
+#header {
+    flex-shrink: 0;
+}
+#recipe-body {
+    margin: 6rem auto 0;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 #recipe-list {
     list-style: none;
-    padding: 0;
+    margin: 0;
+    padding: 0 0 4rem;
     text-align: center;
-}
-#recipe-list::before { /* Short centered rule above the recipes, like the recipe viewer's */
-    content: '';
-    display: block;
-    width: 30%;
-    margin: 0 auto 2rem;
-    border-top: 1px solid var(--chalkboard);
+    flex: 1;
+    overflow-y: auto;
 }
 #recipe-list li {
     margin: 0.8rem 0;
@@ -41,7 +44,15 @@
 }
 #recipe-filters {
     width: min(90%, 44rem);
-    margin: 0 auto 1.5rem;
+    margin: 0 auto 2rem;
+    flex-shrink: 0;
+}
+#recipe-filters::after { /* Short centered rule above the recipes, like the recipe viewer's; here so it doesn't scroll with them */
+    content: '';
+    display: block;
+    width: 33%; /* About 30% of the page column, since the filters are a bit narrower */
+    margin: 1.5rem auto 0;
+    border-top: 1px solid var(--chalkboard);
 }
 #tag-filters {
     display: grid;
@@ -83,6 +94,18 @@
 }
 #recipe-search:focus {
     outline: none;
+}
+#recipe-search::-webkit-search-cancel-button { /* The browser's clear button, redrawn as an × in the site's colors */
+    -webkit-appearance: none;
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-left: 6px;
+    background-color: var(--chalkboard-light);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1 1l8 8M9 1l-8 8' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    cursor: pointer;
+}
+#recipe-search::-webkit-search-cancel-button:hover {
+    background-color: var(--dark-fava);
 }
 #filter-toggle {
     align-self: stretch;
@@ -199,4 +222,17 @@
 }
 .tag-filter-remove:hover {
     color: var(--chalkboard);
+}
+
+@media (max-width: 700px) {
+    #recipe-body { /* Keep the search bar near the top on small screens */
+        margin-top: 3rem;
+    }
+    #filter-toggle { /* Caret only; the text stays for screen readers */
+        font-size: 0;
+    }
+    #filter-toggle::after {
+        font-size: 0.85rem;
+        margin-left: 0;
+    }
 }
