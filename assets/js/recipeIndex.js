@@ -45,13 +45,6 @@ async function loadRecipeList() {
         return;
     }
 
-    // TEMP: dummy recipes for testing the scrolling list. Remove before committing.
-    for (let i = 1; i <= 40; i++) {
-        const dummy = { id: `dummy-${i}`, name: `Dummy Recipe ${i}`, description: '', process: '' };
-        filterCategories.forEach(category => { dummy[category.field] = []; });
-        recipeIndex.recipes.push(dummy);
-    }
-
     if (recipeIndex.recipes.length === 0) {
         renderRecipeList([], "No recipes yet.");
         return;
