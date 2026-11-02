@@ -43,6 +43,6 @@ $loggedIn = isLoggedIn(); // Starts the session before any output, so the header
 
 	<script src="/assets/js/db-handler.js?v=1"></script>
 	<script src="/assets/js/tagFilter.js?v=1"></script>
-	<script src="/assets/js/recipeIndex.js?v=1"></script>
+	<script src="/assets/js/recipeIndex.js?v=2"></script>
 </body>
 </html>

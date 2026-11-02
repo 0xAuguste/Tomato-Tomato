@@ -8,7 +8,7 @@ const filterCategories = [
     { field: 'meals', label: 'Meal', param: 'meal' },
     { field: 'seasons', label: 'Season', param: 'season' },
     { field: 'types', label: 'Type', param: 'type' },
-    { field: 'ingredients', label: 'Contains', param: 'contains', matchAll: true }, // Garlic + onion means both
+    { field: 'ingredients', label: 'Ingredients', param: 'contains', matchAll: true }, // Garlic + onion means both
 ];
 let tagFilters = {}; // createTagFilter results (tagFilter.js), keyed by field (filled by loadRecipeList)
 
