@@ -25,7 +25,7 @@ if (!$recipeID) {
 
 try {
     // Fetch main recipe data
-    $sql_recipe = "SELECT id, name, description, process, yield FROM recipe WHERE id = :id";
+    $sql_recipe = "SELECT id, name, description, process, yield, listAsIngredient FROM recipe WHERE id = :id";
     $stmt_recipe = $pdo->prepare($sql_recipe);
     $stmt_recipe->bindParam(':id', $recipeID);
     $stmt_recipe->execute();
@@ -45,6 +45,7 @@ try {
             ri.ingredientID,
             lr.id AS linkedRecipeID,
             ri.quantity,
+            ri.unitID,
             u.name AS unitName,
             ri.displayText,
             ri.frontendIngredID
@@ -59,7 +60,7 @@ try {
     $ingredients = $stmt_ingredients->fetchAll();
 
     // Authors, alphabetically (recipe_sources has no order column)
-    $sql_source = "SELECT s.name, rs.link FROM recipe_sources rs JOIN source s ON rs.sourceID = s.id WHERE rs.recipeID = :recipeID ORDER BY s.name";
+    $sql_source = "SELECT s.id, s.name, rs.link FROM recipe_sources rs JOIN source s ON rs.sourceID = s.id WHERE rs.recipeID = :recipeID ORDER BY s.name";
     $stmt_source = $pdo->prepare($sql_source);
     $stmt_source->bindParam(':recipeID', $recipeID);
     $stmt_source->execute();
@@ -72,29 +73,29 @@ try {
         }
     }
 
-    $sql_cuisine = "SELECT c.name FROM recipe_cuisines rc JOIN cuisine c ON rc.cuisineID = c.id WHERE rc.recipeID = :recipeID";
+    $sql_cuisine = "SELECT c.id, c.name FROM recipe_cuisines rc JOIN cuisine c ON rc.cuisineID = c.id WHERE rc.recipeID = :recipeID";
     $stmt_cuisine = $pdo->prepare($sql_cuisine);
     $stmt_cuisine->bindParam(':recipeID', $recipeID);
     $stmt_cuisine->execute();
-    $cuisine = $stmt_cuisine->fetchColumn();
+    $cuisine = $stmt_cuisine->fetch();
 
-    $sql_meal = "SELECT m.name FROM recipe_meals rm JOIN meal m ON rm.mealID = m.id WHERE rm.recipeID = :recipeID";
+    $sql_meal = "SELECT m.id, m.name FROM recipe_meals rm JOIN meal m ON rm.mealID = m.id WHERE rm.recipeID = :recipeID";
     $stmt_meal = $pdo->prepare($sql_meal);
     $stmt_meal->bindParam(':recipeID', $recipeID);
     $stmt_meal->execute();
-    $meal = $stmt_meal->fetchColumn();
+    $meal = $stmt_meal->fetch();
 
-    $sql_season = "SELECT s.name FROM recipe_seasons rse JOIN season s ON rse.seasonID = s.id WHERE rse.recipeID = :recipeID";
+    $sql_season = "SELECT s.id, s.name FROM recipe_seasons rse JOIN season s ON rse.seasonID = s.id WHERE rse.recipeID = :recipeID";
     $stmt_season = $pdo->prepare($sql_season);
     $stmt_season->bindParam(':recipeID', $recipeID);
     $stmt_season->execute();
-    $season = $stmt_season->fetchColumn();
+    $season = $stmt_season->fetch();
 
-    $sql_type = "SELECT t.name FROM recipe_types rt JOIN type t ON rt.typeID = t.id WHERE rt.recipeID = :recipeID";
+    $sql_type = "SELECT t.id, t.name FROM recipe_types rt JOIN type t ON rt.typeID = t.id WHERE rt.recipeID = :recipeID";
     $stmt_type = $pdo->prepare($sql_type);
     $stmt_type->bindParam(':recipeID', $recipeID);
     $stmt_type->execute();
-    $type = $stmt_type->fetchColumn();
+    $type = $stmt_type->fetch();
 
 
     // Combine all data
@@ -106,11 +107,17 @@ try {
         'yield' => $recipe['yield'],
         'ingredients' => $ingredients,
         'sources' => array_column($sources, 'name'), // Author names
+        'sourceIDs' => array_column($sources, 'id'), // Same order as sources
         'sourceLink' => $sourceLink,
-        'cuisine' => $cuisine,
-        'meal' => $meal,
-        'season' => $season,
-        'type' => $type,
+        'cuisine' => $cuisine ? $cuisine['name'] : false,
+        'cuisineID' => $cuisine ? $cuisine['id'] : null,
+        'meal' => $meal ? $meal['name'] : false,
+        'mealID' => $meal ? $meal['id'] : null,
+        'season' => $season ? $season['name'] : false,
+        'seasonID' => $season ? $season['id'] : null,
+        'type' => $type ? $type['name'] : false,
+        'typeID' => $type ? $type['id'] : null,
+        'listAsIngredient' => (bool) $recipe['listAsIngredient'],
     ];
 
     echo json_encode($fullRecipe);

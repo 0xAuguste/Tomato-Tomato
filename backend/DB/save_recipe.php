@@ -51,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $seasonID = isset($input['seasonID']) ? $input['seasonID'] : null;
     $typeID = isset($input['typeID']) ? $input['typeID'] : null;
     $listAsIngredient = !empty($input['listAsIngredient']) ? 1 : 0; // Show this recipe in the ingredient dropdown
+    $editingRecipeID = isset($input['id']) && is_string($input['id']) && $input['id'] !== '' ? $input['id'] : null; // Set when updating an existing recipe
 
     // Connect to the database with a new PDO:
     try {
@@ -69,16 +70,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $pdo->beginTransaction();
 
     try {
-        // Generate a new UUID for the recipe
-        $newRecipeID = generate_uuid_v4();
+        if ($editingRecipeID) {
+            // Updating: the recipe keeps its ID, so other recipes using it as an ingredient stay linked
+            $recipeID = $editingRecipeID;
+            $stmt_exists = $pdo->prepare("SELECT 1 FROM recipe WHERE id = :id");
+            $stmt_exists->bindParam(':id', $recipeID);
+            $stmt_exists->execute();
+            if (!$stmt_exists->fetchColumn()) {
+                $pdo->rollBack();
+                http_response_code(404); // Not Found
+                echo json_encode(["message" => "Recipe not found."]);
+                exit();
+            }
 
-        // Prepare the INSERT statement for the recipe table
-        $sql_recipe = "INSERT INTO recipe (id, name, description, process, yield, listAsIngredient)
-                       VALUES (:id, :name, :description, :process, :yield, :listAsIngredient)";
+            $sql_recipe = "UPDATE recipe SET name = :name, description = :description, process = :process,
+                           yield = :yield, listAsIngredient = :listAsIngredient WHERE id = :id";
+
+            // Child rows have no stable identity to update, so they're replaced by the inserts below
+            foreach (['recipe_ingredients', 'recipe_sources', 'recipe_cuisines', 'recipe_meals', 'recipe_seasons', 'recipe_types'] as $childTable) {
+                $stmt_delete = $pdo->prepare("DELETE FROM $childTable WHERE recipeID = :recipeID");
+                $stmt_delete->bindParam(':recipeID', $recipeID);
+                $stmt_delete->execute();
+            }
+        } else {
+            // Generate a new UUID for the recipe
+            $recipeID = generate_uuid_v4();
+
+            $sql_recipe = "INSERT INTO recipe (id, name, description, process, yield, listAsIngredient)
+                           VALUES (:id, :name, :description, :process, :yield, :listAsIngredient)";
+        }
         $stmt_recipe = $pdo->prepare($sql_recipe);
 
         // Bind parameters for recipe table
-        $stmt_recipe->bindParam(':id', $newRecipeID);
+        $stmt_recipe->bindParam(':id', $recipeID);
         $stmt_recipe->bindParam(':name', $recipeName);
         $stmt_recipe->bindParam(':description', $recipeDescription);
         $stmt_recipe->bindParam(':process', $recipeProcess);
@@ -99,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $recipeIngredID = generate_uuid_v4();
 
                 $stmt_recipe_ingredient->bindParam(':id', $recipeIngredID);
-                $stmt_recipe_ingredient->bindParam(':recipeID', $newRecipeID);
+                $stmt_recipe_ingredient->bindParam(':recipeID', $recipeID);
                 $stmt_recipe_ingredient->bindParam(':ingredientID', $ingredientDbId);
                 $stmt_recipe_ingredient->bindParam(':linkedRecipeID', $linkedRecipeId);
                 $stmt_recipe_ingredient->bindParam(':frontendIngredID', $ingredient['id']);
@@ -109,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 $stmt_recipe_ingredient->execute();
             } else {
-                error_log("Ingredient missing database ID and linked recipe ID for recipe ID: {$newRecipeID}. Frontend ID was '{$ingredient['id']}'. Skipping this ingredient for recipe_ingredients table.");
+                error_log("Ingredient missing database ID and linked recipe ID for recipe ID: {$recipeID}. Frontend ID was '{$ingredient['id']}'. Skipping this ingredient for recipe_ingredients table.");
             }
         }
 
@@ -120,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             foreach ($sourceIDs as $sourceID) {
                 $recipeSourceID = generate_uuid_v4();
                 $stmt_recipe_source->bindParam(':id', $recipeSourceID);
-                $stmt_recipe_source->bindParam(':recipeID', $newRecipeID);
+                $stmt_recipe_source->bindParam(':recipeID', $recipeID);
                 $stmt_recipe_source->bindParam(':sourceID', $sourceID);
                 $stmt_recipe_source->bindParam(':link', $sourceLink);
                 $stmt_recipe_source->execute();
@@ -133,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt_recipe_cuisine = $pdo->prepare($sql_recipe_cuisine);
             $recipeCuisineID = generate_uuid_v4();
             $stmt_recipe_cuisine->bindParam(':id', $recipeCuisineID);
-            $stmt_recipe_cuisine->bindParam(':recipeID', $newRecipeID);
+            $stmt_recipe_cuisine->bindParam(':recipeID', $recipeID);
             $stmt_recipe_cuisine->bindParam(':cuisineID', $cuisineID);
             $stmt_recipe_cuisine->execute();
         }
@@ -144,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt_recipe_meal = $pdo->prepare($sql_recipe_meal);
             $recipeMealID = generate_uuid_v4();
             $stmt_recipe_meal->bindParam(':id', $recipeMealID);
-            $stmt_recipe_meal->bindParam(':recipeID', $newRecipeID);
+            $stmt_recipe_meal->bindParam(':recipeID', $recipeID);
             $stmt_recipe_meal->bindParam(':mealID', $mealID);
             $stmt_recipe_meal->execute();
         }
@@ -155,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt_recipe_season = $pdo->prepare($sql_recipe_season);
             $recipeSeasonID = generate_uuid_v4();
             $stmt_recipe_season->bindParam(':id', $recipeSeasonID);
-            $stmt_recipe_season->bindParam(':recipeID', $newRecipeID);
+            $stmt_recipe_season->bindParam(':recipeID', $recipeID);
             $stmt_recipe_season->bindParam(':seasonID', $seasonID);
             $stmt_recipe_season->execute();
         }
@@ -166,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt_recipe_type = $pdo->prepare($sql_recipe_type);
             $recipeTypeID = generate_uuid_v4();
             $stmt_recipe_type->bindParam(':id', $recipeTypeID);
-            $stmt_recipe_type->bindParam(':recipeID', $newRecipeID);
+            $stmt_recipe_type->bindParam(':recipeID', $recipeID);
             $stmt_recipe_type->bindParam(':typeID', $typeID);
             $stmt_recipe_type->execute();
         }
@@ -174,8 +198,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $pdo->commit(); // Commit the transaction if all insertions are successful
 
         // Send success response
-        http_response_code(201); // Created
-        echo json_encode(["message" => "Recipe saved successfully!", "recipe_id" => $newRecipeID]);
+        http_response_code($editingRecipeID ? 200 : 201); // OK or Created
+        echo json_encode(["message" => $editingRecipeID ? "Recipe updated successfully!" : "Recipe saved successfully!", "recipe_id" => $recipeID]);
 
     } catch (PDOException $e) {
         $pdo->rollBack(); // Rollback on error to ensure data consistency

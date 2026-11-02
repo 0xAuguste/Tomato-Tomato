@@ -21,10 +21,18 @@ let selectedOptions = {
 };
 // Frontend ID of the ingredient being edited in the add-ingredient panel, or null when adding a new one
 let editingIngredientId = null;
+// ID of the recipe being edited (from ?id= or after its first save), or null when creating a new one
+let editingRecipeId = null;
 
 // Create an event listener on DOMContentLoaded to ensure elements are available
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDropdownOptions(); // Load all caches
+
+    // /createrecipe/?id=... edits an existing recipe (linked from the recipe index)
+    const recipeId = new URLSearchParams(window.location.search).get('id');
+    if (recipeId) {
+        await loadRecipeForEdit(recipeId);
+    }
 
     // Add event listeners for Enter key on Cuisine and Source inputs
     const cuisineInput = document.getElementById('recipe-cuisine-input');
@@ -321,6 +329,7 @@ async function saveRecipe() {
         ...(recipeData.meal.length > 0 ? { mealID: recipeData.meal} : {}),
         ...(recipeData.type.length > 0 ? { typeID: recipeData.type} : {}),
         listAsIngredient: recipeData.listAsIngredient,
+        ...(editingRecipeId ? { id: editingRecipeId } : {}), // Updates the recipe instead of creating a new one
     };
 
     // Send data to PHP backend using the helper function from db-handler.js
@@ -329,10 +338,58 @@ async function saveRecipe() {
         const response = await saveRecipeEntry(recipePayload); // send data to backend
         console.log(response);
         displayMessage(response.message, 'success');
+        if (!editingRecipeId) {
+            setEditMode(response.recipe_id); // Saving again updates this recipe instead of creating a duplicate
+            history.replaceState(null, '', `?id=${encodeURIComponent(editingRecipeId)}`);
+        }
     } catch (error) {
         console.error("Failed to save recipe:", error);
         displayMessage(error.loggedOut ? error.message : "Error saving recipe. Check console for details.", 'error');
     }
+}
+
+// Fills the creator with a saved recipe; saving then updates it instead of creating a new one
+async function loadRecipeForEdit(recipeId) {
+    let recipe;
+    try {
+        recipe = await getRecipeById(recipeId);
+    } catch (error) {
+        displayMessage(`Couldn't load the recipe to edit: ${error.message}`, 'error');
+        return;
+    }
+    setEditMode(recipe.id);
+
+    // A recipe can't be an ingredient of itself
+    dropdownOptions.ingredient = dropdownOptions.ingredient.filter(row => row.id !== recipe.id);
+    dropdownOptions.recipeIngredient = dropdownOptions.recipeIngredient.filter(row => row.id !== recipe.id);
+
+    document.getElementById('recipe-title').value = recipe.name;
+    document.getElementById('recipe-yield-input').value = recipe.yield ?? '';
+    document.getElementById('recipe-source-link-input').value = recipe.sourceLink ?? '';
+    document.getElementById('recipe-list-as-ingredient').checked = recipe.listAsIngredient;
+    ['cuisine', 'season', 'type', 'meal'].forEach(field => {
+        const id = recipe[`${field}ID`];
+        document.getElementById(`recipe-${field}-input`).value = id ? recipe[field] : '';
+        document.getElementById(`recipe-${field}-id`).value = id ?? '';
+    });
+    selectedOptions.source = recipe.sourceIDs.map((id, i) => ({ id, name: recipe.sources[i] }));
+    renderSelectedOptions(document.getElementById('recipe-source-input'));
+
+    // Saved ingredients keyed by frontend ID, as the Ingredient objects stored on the editor's ingredient nodes
+    const ingredients = new Map();
+    recipe.ingredients.forEach(row => {
+        const quantity = row.quantity === null ? '' : String(parseFloat(row.quantity)); // decimal(5,3): "2.000" -> "2"
+        ingredients.set(String(row.frontendIngredID), new Ingredient(row.frontendIngredID, row.ingredientName ?? '',
+            row.ingredientID ?? '', quantity, row.unitName ?? '', row.unitID ?? '', row.displayText, row.linkedRecipeID ?? ''));
+    });
+    setRecipeContent(recipe.description, recipe.process, ingredients);
+}
+
+// Marks the creator as editing the given recipe
+function setEditMode(recipeId) {
+    editingRecipeId = recipeId;
+    document.title = 'Edit Recipe';
+    document.getElementById('save-recipe-button').innerText = 'Save Changes';
 }
 
 function validRecipe() {

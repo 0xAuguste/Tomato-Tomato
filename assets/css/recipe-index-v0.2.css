@@ -23,3 +23,12 @@
 #recipe-list a:hover {
     color: var(--dark-fava);
 }
+#recipe-list a.edit-recipe {
+    margin-left: 0.5rem;
+    font-size: 1.1rem;
+    text-decoration: none;
+    opacity: 0.6;
+}
+#recipe-list a.edit-recipe:hover {
+    opacity: 1;
+}

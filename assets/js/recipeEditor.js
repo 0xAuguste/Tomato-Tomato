@@ -1,5 +1,5 @@
 // Sets up the Tiptap editors for the recipe description and process.
-// Loaded as a module; exposes descriptionEditor, processEditor, insertIngredient() and updateIngredient() on window
+// Loaded as a module; exposes descriptionEditor, processEditor, insertIngredient(), updateIngredient() and setRecipeContent() on window
 // so the classic scripts (createRecipe.js, recipeData.js) can use them.
 import { Editor, Node, Extension, mergeAttributes, Document, Paragraph, Text, Heading, UndoRedo,
          Plugin, PluginKey, Decoration, DecorationSet } from '/assets/js/vendor/tiptap.js';
@@ -110,10 +110,16 @@ window.processEditor = createEditor(document.getElementById('recipe-process'), [
     ProcessShortcuts,
 ]);
 
+// Ingredient node attributes for an Ingredient (from recipeData.js); missing fields become ""
+function ingredientAttrs(ingredient) {
+    const attrs = {};
+    ingredientFields.forEach(field => attrs[field] = String(ingredient[field] ?? ''));
+    return attrs;
+}
+
 // Inserts an Ingredient (from recipeData.js) at the process editor's cursor
 window.insertIngredient = function (ingredient) {
-    const attrs = {};
-    ingredientFields.forEach(field => attrs[field] = String(ingredient[field]));
+    const attrs = ingredientAttrs(ingredient);
 
     // Follow the ingredient with a space (unless whitespace already follows) so the cursor lands in
     // plain text; browsers draw a cursor placed directly after an uneditable span inside the span
@@ -129,8 +135,7 @@ window.insertIngredient = function (ingredient) {
 // Replaces the data of every ingredient node with the given frontend ID (copy-pasted ingredients share
 // an ID and are saved as one, so they're kept in sync)
 window.updateIngredient = function (ingredient) {
-    const attrs = {};
-    ingredientFields.forEach(field => attrs[field] = String(ingredient[field]));
+    const attrs = ingredientAttrs(ingredient);
 
     const { tr } = processEditor.state;
     processEditor.state.doc.descendants((node, pos) => {
@@ -139,4 +144,29 @@ window.updateIngredient = function (ingredient) {
         }
     });
     processEditor.view.dispatch(tr);
+};
+
+// Loads a saved description and process (as returned by get_recipe.php) into the editors, without an undo step,
+// so undo can't clear the loaded recipe. ingredients maps frontend IDs to Ingredient objects (recipeData.js)
+window.setRecipeContent = function (description, process, ingredients) {
+    const textContent = text => text ? [{ type: 'text', text }] : [];
+    const doc = blocks => ({ type: 'doc', content: blocks.length ? blocks : [{ type: 'paragraph' }] });
+
+    const descriptionBlocks = (description || []).map(text => ({ type: 'paragraph', content: textContent(text) }));
+
+    const processBlocks = (process || []).map(block => {
+        if (block.type === 'header') {
+            return { type: 'heading', attrs: { level: 1 }, content: textContent(block.text) };
+        }
+        return {
+            type: 'paragraph',
+            content: block.content.map(segment => segment.type === 'ingredient'
+                // An ingredient without a saved row (e.g. its recipe was deleted) keeps just its display text
+                ? { type: 'ingredient', attrs: ingredientAttrs(ingredients.get(String(segment.id)) ?? { id: segment.id, displayText: segment.displayText }) }
+                : { type: 'text', text: segment.text }),
+        };
+    });
+
+    descriptionEditor.chain().setMeta('addToHistory', false).setContent(doc(descriptionBlocks)).run();
+    processEditor.chain().setMeta('addToHistory', false).setContent(doc(processBlocks)).run();
 };
