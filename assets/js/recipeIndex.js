@@ -1,20 +1,30 @@
 let allRecipes = []; // Every recipe with its filterable IDs, sorted by name (filled by loadRecipeList)
 
+// Metadata filters, in display order: the recipe_index.php field, dropdown label, and URL parameter
+const filterCategories = [
+    { field: 'sources', label: 'Author', param: 'author' },
+    { field: 'cuisines', label: 'Cuisine', param: 'cuisine' },
+    { field: 'meals', label: 'Meal', param: 'meal' },
+    { field: 'seasons', label: 'Season', param: 'season' },
+    { field: 'types', label: 'Type', param: 'type' },
+];
+let tagFilters = {}; // createTagFilter results (tagFilter.js), keyed by field (filled by loadRecipeList)
+
 document.addEventListener('DOMContentLoaded', async () => {
     const searchInput = document.getElementById('recipe-search');
     searchInput.value = new URLSearchParams(window.location.search).get('q') || ''; // Restore a search from the URL
-    searchInput.addEventListener('input', applySearch);
+    searchInput.addEventListener('input', applyFilters);
     searchInput.addEventListener('keydown', event => {
         if (event.key === 'Escape') {
             searchInput.value = '';
-            applySearch();
+            applyFilters();
         }
     });
 
     await loadRecipeList();
 });
 
-// Function to fetch all recipes, sort them, and display them
+// Function to fetch all recipes, sort them, set up the filters, and display them
 async function loadRecipeList() {
     let recipeIndex;
     try {
@@ -34,18 +44,39 @@ async function loadRecipeList() {
         recipe.searchText = normalizeText([recipe.name, recipe.description, recipe.process].join(' '));
     });
 
+    // One dropdown per category that any recipe uses, with filters from the URL restored (e.g. ?cuisine=id,id)
+    const urlParams = new URLSearchParams(window.location.search);
+    filterCategories.forEach(category => {
+        const options = recipeIndex.options[category.field];
+        if (options.length === 0) return;
+        tagFilters[category.field] = createTagFilter({
+            container: document.getElementById('tag-filters'),
+            pillContainer: document.getElementById('filter-pills'),
+            label: category.label,
+            options: options,
+            onChange: applyFilters
+        });
+        const ids = urlParams.get(category.param);
+        if (ids) tagFilters[category.field].setSelected(ids.split(','));
+    });
+
     allRecipes = recipeIndex.recipes.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
-    applySearch();
+    applyFilters();
 }
 
 // Lowercases and strips accents, so "creme" matches "Crème"
 function normalizeText(text) {
-    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
 
-// Function to show only the recipes matching the search box, and keep the search in the URL (?q=)
-function applySearch() {
+// Function to show only the recipes matching the search box and filters, and keep them in the URL (?q=&cuisine=)
+function applyFilters() {
+    if (allRecipes.length === 0) return; // Still loading (the URL keeps its filters), or there are no recipes
+
     const query = document.getElementById('recipe-search').value.trim();
+    const picked = filterCategories
+        .filter(category => tagFilters[category.field])
+        .map(category => ({ ...category, ids: tagFilters[category.field].getSelected() }));
 
     const url = new URL(window.location.href);
     if (query) {
@@ -53,13 +84,22 @@ function applySearch() {
     } else {
         url.searchParams.delete('q');
     }
+    picked.forEach(category => {
+        if (category.ids.length > 0) {
+            url.searchParams.set(category.param, category.ids.join(','));
+        } else {
+            url.searchParams.delete(category.param);
+        }
+    });
     history.replaceState(null, '', url);
 
-    if (allRecipes.length === 0) return; // Still loading, or there are no recipes ("No recipes yet." is already shown)
-
-    // Every word must appear somewhere in the recipe's search text, in any order
+    // Every word must appear somewhere in the recipe's search text, in any order,
+    // and the recipe must have at least one picked option in every category with picks
     const words = normalizeText(query).split(/\s+/).filter(Boolean);
-    const matches = allRecipes.filter(recipe => words.every(word => recipe.searchText.includes(word)));
+    const matches = allRecipes.filter(recipe =>
+        words.every(word => recipe.searchText.includes(word)) &&
+        picked.every(category => category.ids.length === 0 || category.ids.some(id => recipe[category.field].includes(id)))
+    );
     renderRecipeList(matches, "No recipes match.");
 }
 

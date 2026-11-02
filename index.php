@@ -23,15 +23,18 @@ $loggedIn = isLoggedIn(); // Starts the session before any output, so the header
 
 	<div id="recipe-body">
 		<h1 id="recipe-title">Recipes</h1>
-		<!-- Filters the list as you type (recipeIndex.js) -->
+		<!-- Filters the list as you type or pick tags (recipeIndex.js) -->
 		<div id="recipe-filters">
 			<input type="search" id="recipe-search" placeholder="Search recipes" aria-label="Search recipes" autocomplete="off">
+			<div id="tag-filters"></div> <!-- One dropdown per category (tagFilter.js) -->
+			<div id="filter-pills"></div> <!-- Picked tags from every dropdown -->
 		</div>
 		<!-- Logged-in users get an edit link next to each recipe (recipeIndex.js) -->
 		<ul id="recipe-list"<?php if ($loggedIn) echo ' data-logged-in'; ?>></ul>
 	</div>
 
 	<script src="/assets/js/db-handler.js"></script>
+	<script src="/assets/js/tagFilter.js"></script>
 	<script src="/assets/js/recipeIndex.js"></script>
 </body>
 </html>

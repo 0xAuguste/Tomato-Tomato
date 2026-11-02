@@ -33,8 +33,24 @@
     opacity: 1;
 }
 #recipe-filters {
-    width: min(90%, 28rem);
+    width: min(90%, 44rem);
     margin: 0 auto 1.5rem;
+}
+#tag-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+#filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+#filter-pills:not(:has(.tag-filter-pill)) { /* No picks yet */
+    display: none;
 }
 #recipe-search {
     width: 100%;
