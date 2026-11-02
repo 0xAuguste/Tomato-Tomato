@@ -1,12 +1,14 @@
 let allRecipes = []; // Every recipe with its filterable IDs, sorted by name (filled by loadRecipeList)
 
-// Metadata filters, in display order: the recipe_index.php field, dropdown label, and URL parameter
+// Filters, in display order: the recipe_index.php field, dropdown label, and URL parameter.
+// A recipe needs any one of a category's picks, or all of them with matchAll.
 const filterCategories = [
     { field: 'sources', label: 'Author', param: 'author' },
     { field: 'cuisines', label: 'Cuisine', param: 'cuisine' },
     { field: 'meals', label: 'Meal', param: 'meal' },
     { field: 'seasons', label: 'Season', param: 'season' },
     { field: 'types', label: 'Type', param: 'type' },
+    { field: 'ingredients', label: 'Contains', param: 'contains', matchAll: true }, // Garlic + onion means both
 ];
 let tagFilters = {}; // createTagFilter results (tagFilter.js), keyed by field (filled by loadRecipeList)
 
@@ -94,11 +96,14 @@ function applyFilters() {
     history.replaceState(null, '', url);
 
     // Every word must appear somewhere in the recipe's search text, in any order,
-    // and the recipe must have at least one picked option in every category with picks
+    // and the recipe must have the picked options of every category (any one of them, or all with matchAll)
     const words = normalizeText(query).split(/\s+/).filter(Boolean);
     const matches = allRecipes.filter(recipe =>
         words.every(word => recipe.searchText.includes(word)) &&
-        picked.every(category => category.ids.length === 0 || category.ids.some(id => recipe[category.field].includes(id)))
+        picked.every(category => {
+            const hasOption = id => recipe[category.field].includes(id);
+            return category.ids.length === 0 || (category.matchAll ? category.ids.every(hasOption) : category.ids.some(hasOption));
+        })
     );
     renderRecipeList(matches, "No recipes match.");
 }
