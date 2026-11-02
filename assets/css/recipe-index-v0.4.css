@@ -1,12 +1,7 @@
 /* Styling for recipe index page */
 
 #recipe-body {
-    margin: 3rem auto 4rem;
-}
-#recipe-title {
-    font-size: 2.7rem;
-    padding: 2rem 0;
-    margin: 0 auto;
+    margin: 6rem auto 4rem;
 }
 #recipe-list {
     list-style: none;
@@ -199,4 +194,10 @@
 }
 .tag-filter-remove:hover {
     color: var(--chalkboard);
+}
+
+@media (max-width: 700px) {
+    #recipe-body { /* Keep the search bar near the top on small screens */
+        margin-top: 3rem;
+    }
 }
