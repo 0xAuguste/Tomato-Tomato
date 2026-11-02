@@ -1,4 +1,4 @@
-let allRecipes = []; // Every recipe with its filterable IDs, sorted by name (filled by loadRecipeList)
+let allRecipes = []; // Every recipe with its filterable IDs, in random order (filled by loadRecipeList)
 
 // Filters, in display order: the recipe_index.php field, dropdown label, and URL parameter.
 // A recipe needs any one of a category's picks, or all of them with matchAll.
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadRecipeList();
 });
 
-// Function to fetch all recipes, sort them, set up the filters, and display them
+// Function to fetch all recipes, shuffle them, set up the filters, and display them
 async function loadRecipeList() {
     let recipeIndex;
     try {
@@ -78,8 +78,17 @@ async function loadRecipeList() {
         if (ids) tagFilters[category.field].setSelected(ids.split(','));
     });
 
-    allRecipes = recipeIndex.recipes.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+    allRecipes = shuffle(recipeIndex.recipes); // New order on every page load
     applyFilters();
+}
+
+// Function to put an array in random order, in place (Fisher-Yates)
+function shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
 }
 
 // Lowercases and strips accents, so "creme" matches "Crème"
