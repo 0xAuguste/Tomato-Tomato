@@ -37,7 +37,7 @@ isLoggedIn(); // Starts the session before any output, so the header can show Lo
 	
 
 	<script src="/assets/js/db-handler.js?v=1"></script>
-	<script src="/assets/js/recipeData.js?v=1"></script>
+	<script src="/assets/js/recipeData.js?v=2"></script>
 	<script src="/assets/js/recipeViewer.js?v=1"></script>
 </body>
 </html>
