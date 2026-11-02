@@ -1,19 +1,27 @@
 /* Styling for recipe index page */
 
+body { /* Page fills the screen, so only the recipe list scrolls */
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+#header {
+    flex-shrink: 0;
+}
 #recipe-body {
-    margin: 6rem auto 4rem;
+    margin: 6rem auto 0;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 #recipe-list {
     list-style: none;
-    padding: 0;
+    margin: 0;
+    padding: 0 0 4rem;
     text-align: center;
-}
-#recipe-list::before { /* Short centered rule above the recipes, like the recipe viewer's */
-    content: '';
-    display: block;
-    width: 30%;
-    margin: 0 auto 2rem;
-    border-top: 1px solid var(--chalkboard);
+    flex: 1;
+    overflow-y: auto;
 }
 #recipe-list li {
     margin: 0.8rem 0;
@@ -36,7 +44,15 @@
 }
 #recipe-filters {
     width: min(90%, 44rem);
-    margin: 0 auto 1.5rem;
+    margin: 0 auto 2rem;
+    flex-shrink: 0;
+}
+#recipe-filters::after { /* Short centered rule above the recipes, like the recipe viewer's; here so it doesn't scroll with them */
+    content: '';
+    display: block;
+    width: 33%; /* About 30% of the page column, since the filters are a bit narrower */
+    margin: 1.5rem auto 0;
+    border-top: 1px solid var(--chalkboard);
 }
 #tag-filters {
     display: grid;
