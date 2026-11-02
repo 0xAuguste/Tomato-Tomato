@@ -13,7 +13,7 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
 	<link href="/assets/css/main-v1.1.css" type="text/css" rel="stylesheet">
-	<link href="/assets/css/recipe-creator-v1.4.css" type="text/css" rel="stylesheet">
+	<link href="/assets/css/recipe-creator-v1.5.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<?php
@@ -101,6 +101,8 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
         </div>
 	</div>
 	<button type="button" id="save-recipe-button" onclick="saveRecipe()">Save Recipe</button>
+	<!-- Shown once the creator is editing a saved recipe (setEditMode in createRecipe.js) -->
+	<button type="button" id="delete-recipe-button" onclick="deleteRecipe()" style="display: none">Delete Recipe</button>
 
 	<div id="add-ingredient-panel" style="display: none">
 		<div class="ingredient-panel-content">

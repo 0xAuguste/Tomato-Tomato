@@ -390,6 +390,21 @@ function setEditMode(recipeId) {
     editingRecipeId = recipeId;
     document.title = 'Edit Recipe';
     document.getElementById('save-recipe-button').innerText = 'Save Changes';
+    document.getElementById('delete-recipe-button').style.display = 'block';
+}
+
+// Deletes the recipe being edited, after confirming, then returns to the recipe index
+async function deleteRecipe() {
+    const name = document.getElementById('recipe-title').value.trim() || 'this recipe';
+    if (!editingRecipeId || !confirm(`Delete "${name}"? This can't be undone.`)) {
+        return;
+    }
+    try {
+        await deleteRecipeEntry(editingRecipeId);
+        window.location.href = '/';
+    } catch (error) {
+        displayMessage(error.message, 'error'); // e.g. logged out, or still used as an ingredient
+    }
 }
 
 function validRecipe() {
