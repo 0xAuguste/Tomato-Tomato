@@ -163,3 +163,20 @@ async function getRecipeById(recipeId) {
         throw error; // Re-throw to be handled by the calling function
     }
 }
+
+// Function to grab every recipe with its filterable IDs, plus the filter options in use (see recipe_index.php)
+async function getRecipeIndex() {
+    const path = '/backend/DB/recipe_index.php';
+
+    try {
+        const response = await fetch(path);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching recipe index:", error);
+        throw error;
+    }
+}
