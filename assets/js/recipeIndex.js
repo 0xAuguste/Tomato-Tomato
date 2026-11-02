@@ -1,4 +1,4 @@
-let allRecipes = []; // Every recipe, sorted by name (filled by loadRecipeList)
+let allRecipes = []; // Every recipe with its filterable IDs, sorted by name (filled by loadRecipeList)
 
 document.addEventListener('DOMContentLoaded', async () => {
     const searchInput = document.getElementById('recipe-search');
@@ -16,16 +16,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Function to fetch all recipes, sort them, and display them
 async function loadRecipeList() {
-    const recipes = await getTableRows('recipe');
+    let recipeIndex;
+    try {
+        recipeIndex = await getRecipeIndex();
+    } catch (error) {
+        renderRecipeList([], "Couldn't load recipes. Try refreshing the page.");
+        return;
+    }
 
-    // getTableRows returns an object (not an array) when the table is empty or the query fails
-    if (!Array.isArray(recipes) || recipes.length === 0) {
+    if (recipeIndex.recipes.length === 0) {
         renderRecipeList([], "No recipes yet.");
         return;
     }
 
-    recipes.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
-    allRecipes = recipes;
+    allRecipes = recipeIndex.recipes.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
     applySearch();
 }
 
