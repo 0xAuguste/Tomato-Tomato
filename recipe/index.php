@@ -12,8 +12,8 @@ isLoggedIn(); // Starts the session before any output, so the header can show Lo
 	<title>Recipe</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
-    <link href="/assets/css/main-v1.1.css" type="text/css" rel="stylesheet">
-    <link href="/assets/css/recipe-viewer-v0.5.css" type="text/css" rel="stylesheet">
+    <link href="/assets/css/main.css?v=1" type="text/css" rel="stylesheet">
+    <link href="/assets/css/recipe-viewer.css?v=1" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<?php
@@ -33,11 +33,15 @@ isLoggedIn(); // Starts the session before any output, so the header can show Lo
         </div>
         <div id="recipe-description" class="recipe-section"></div>
         <div id="recipe-process" class="recipe-section"></div>
+        <div id="recipe-notes" class="recipe-section">
+            <h4 class="section-label">Notes</h4>
+            <div id="recipe-notes-content"></div>
+        </div>
 	</div>
 	
 
 	<script src="/assets/js/db-handler.js?v=1"></script>
-	<script src="/assets/js/recipeData.js?v=2"></script>
-	<script src="/assets/js/recipeViewer.js?v=2"></script>
+	<script src="/assets/js/recipeData.js?v=3"></script>
+	<script src="/assets/js/recipeViewer.js?v=3"></script>
 </body>
 </html>

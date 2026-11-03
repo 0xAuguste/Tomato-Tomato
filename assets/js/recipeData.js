@@ -3,6 +3,7 @@ class RecipeData {
         this.name = "";
         this.description = [];
         this.process = [];
+        this.notes = []; // Same format as process, without headers or ingredients
         this.ingredients = [];
         this.yield = "";
         this.sources = []; // Author (source table) IDs
@@ -26,15 +27,25 @@ class RecipeData {
 
     // Reads headers, paragraphs and lists (text + inline ingredients) from the process editor
     parseProcess(editor) {
-        const structuredProcess = [];
+        this.process = this.parseBlocks(editor);
+    }
+
+    // Reads paragraphs and lists from the notes editor
+    parseNotes(editor) {
+        this.notes = this.parseBlocks(editor);
+    }
+
+    // Reads an editor's headers, paragraphs and lists as an array of blocks
+    parseBlocks(editor) {
+        const blocks = [];
 
         editor.state.doc.forEach(block => {
             if (block.type.name === 'heading') {
-                structuredProcess.push({ type: 'header', text: block.textContent });
+                blocks.push({ type: 'header', text: block.textContent });
             } else if (block.type.name === 'paragraph') {
                 const paragraphContent = this.parseParagraph(block);
                 if (paragraphContent.length > 0) {
-                    structuredProcess.push({ type: 'paragraph', content: paragraphContent });
+                    blocks.push({ type: 'paragraph', content: paragraphContent });
                 }
             } else if (block.type.name === 'bulletList' || block.type.name === 'orderedList') {
                 // Each list item holds one paragraph (lists are flat, see recipeEditor.js); empty items are dropped
@@ -50,11 +61,11 @@ class RecipeData {
                     if (list.ordered) {
                         list.start = block.attrs.start;
                     }
-                    structuredProcess.push(list);
+                    blocks.push(list);
                 }
             }
         });
-        this.process = structuredProcess;
+        return blocks;
     }
 
     // Reads a paragraph node as an array of text and ingredient segments

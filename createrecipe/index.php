@@ -12,8 +12,8 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
 	<title>Recipe Creator</title>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
-	<link href="/assets/css/main-v1.1.css" type="text/css" rel="stylesheet">
-	<link href="/assets/css/recipe-creator-v1.6.css" type="text/css" rel="stylesheet">
+	<link href="/assets/css/main.css?v=1" type="text/css" rel="stylesheet">
+	<link href="/assets/css/recipe-creator.css?v=1" type="text/css" rel="stylesheet">
 </head>
 <body>
 	<?php
@@ -25,12 +25,15 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
 		<input name="recipe-title" id="recipe-title" placeholder="Recipe Name" autocomplete="off">
 
 		<h4 class="section-label">Description</h4>
-		<!-- Description and Process editors are created by recipeEditor.js -->
+		<!-- Description, Process and Notes editors are created by recipeEditor.js -->
 		<div name="recipe-description" id="recipe-description" class="user-input text-entry"></div>
 
 		<h4 class="section-label">Process</h4>
 		<div name="recipe-process" id="recipe-process" class="user-input text-entry"></div>
 		<p id="shift-note"><b>Shift + Return</b> to add an ingredient &nbsp;·&nbsp; <b>#</b> to toggle a section header</p>
+
+		<h4 class="section-label">Notes</h4>
+		<div name="recipe-notes" id="recipe-notes" class="user-input text-entry"></div>
 
 		<h4 class="section-label">Other Optional Info</h4>
 		<div id="recipe-metadata-bottom">
@@ -174,8 +177,8 @@ requireLoginPage(); // Before any output, so the redirect header can be sent
 	</div>
 
 	<script src="/assets/js/db-handler.js?v=1"></script>
-	<script src="/assets/js/recipeData.js?v=2"></script>
-	<script src="/assets/js/createRecipe.js?v=1"></script>
-	<script type="module" src="/assets/js/recipeEditor.js?v=2"></script>
+	<script src="/assets/js/recipeData.js?v=3"></script>
+	<script src="/assets/js/createRecipe.js?v=2"></script>
+	<script type="module" src="/assets/js/recipeEditor.js?v=3"></script>
 </body>
 </html>

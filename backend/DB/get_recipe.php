@@ -25,7 +25,7 @@ if (!$recipeID) {
 
 try {
     // Fetch main recipe data
-    $sql_recipe = "SELECT id, name, description, process, yield, listAsIngredient FROM recipe WHERE id = :id";
+    $sql_recipe = "SELECT id, name, description, process, notes, yield, listAsIngredient FROM recipe WHERE id = :id";
     $stmt_recipe = $pdo->prepare($sql_recipe);
     $stmt_recipe->bindParam(':id', $recipeID);
     $stmt_recipe->execute();
@@ -104,6 +104,7 @@ try {
         'name' => $recipe['name'],
         'description' => json_decode($recipe['description'], true),
         'process' => json_decode($recipe['process'], true),
+        'notes' => json_decode($recipe['notes'], true) ?? [],
         'yield' => $recipe['yield'],
         'ingredients' => $ingredients,
         'sources' => array_column($sources, 'name'), // Author names

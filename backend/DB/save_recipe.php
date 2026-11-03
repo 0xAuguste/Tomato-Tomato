@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $recipeName = $input['name'];
     $recipeDescription = $input['description'];
     $recipeProcess = $input['process'];
+    $recipeNotes = isset($input['notes']) ? $input['notes'] : null;
     $recipeIngredients = json_decode($input['ingredients'], true);
     // var_dump($recipeIngredients);
 
@@ -83,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 exit();
             }
 
-            $sql_recipe = "UPDATE recipe SET name = :name, description = :description, process = :process,
+            $sql_recipe = "UPDATE recipe SET name = :name, description = :description, process = :process, notes = COALESCE(:notes, notes),
                            yield = :yield, listAsIngredient = :listAsIngredient WHERE id = :id";
 
             // Child rows have no stable identity to update, so they're replaced by the inserts below
@@ -96,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Generate a new UUID for the recipe
             $recipeID = generate_uuid_v4();
 
-            $sql_recipe = "INSERT INTO recipe (id, name, description, process, yield, listAsIngredient)
-                           VALUES (:id, :name, :description, :process, :yield, :listAsIngredient)";
+            $sql_recipe = "INSERT INTO recipe (id, name, description, process, notes, yield, listAsIngredient)
+                           VALUES (:id, :name, :description, :process, COALESCE(:notes, '[]'), :yield, :listAsIngredient)";
         }
         $stmt_recipe = $pdo->prepare($sql_recipe);
 
@@ -106,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt_recipe->bindParam(':name', $recipeName);
         $stmt_recipe->bindParam(':description', $recipeDescription);
         $stmt_recipe->bindParam(':process', $recipeProcess);
+        $stmt_recipe->bindParam(':notes', $recipeNotes);
         $stmt_recipe->bindParam(':yield', $recipeYield);
         $stmt_recipe->bindParam(':listAsIngredient', $listAsIngredient, PDO::PARAM_INT);
         $stmt_recipe->execute();

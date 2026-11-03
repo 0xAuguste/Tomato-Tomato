@@ -48,6 +48,14 @@
 #recipe-ingredients {
     display: none;
 }
+#recipe-notes { /* Shown by recipeViewer.js when the recipe has notes */
+    display: none;
+}
+#recipe-notes .section-label { /* In the body font, lined up with the notes */
+    font-family: inherit;
+    font-size: 1.2rem; /* Between the body text (1.1rem) and section headers (1.5rem) */
+    margin-left: 0;
+}
 .ingredient-text {
     font-weight: 1000;
 }
