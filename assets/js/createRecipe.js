@@ -300,9 +300,10 @@ async function saveRecipe() {
     // Get Recipe Title
     recipeData.name = document.getElementById('recipe-title').value;
 
-    // Parse Description, Process and Ingredients from the editors into recipeData object
+    // Parse Description, Process, Notes and Ingredients from the editors into recipeData object
     recipeData.parseDescription(descriptionEditor); // Populates recipeData.description
     recipeData.parseProcess(processEditor);         // Populates recipeData.process
+    recipeData.parseNotes(notesEditor);             // Populates recipeData.notes
     recipeData.parseIngredients(processEditor);     // Populates recipeData.ingredients
     
     // Get metadata
@@ -320,6 +321,7 @@ async function saveRecipe() {
         name: recipeData.name,
         description: JSON.stringify(recipeData.description),
         process: JSON.stringify(recipeData.process),
+        notes: JSON.stringify(recipeData.notes),
         ingredients: JSON.stringify(recipeData.ingredients), // This will contain frontend IDs and DB IDs
         ...(recipeData.sources.length > 0 ? { sourceIDs: recipeData.sources} : {}),
         ...(recipeData.sourceLink.length > 0 ? { sourceLink: recipeData.sourceLink} : {}),
@@ -382,7 +384,7 @@ async function loadRecipeForEdit(recipeId) {
         ingredients.set(String(row.frontendIngredID), new Ingredient(row.frontendIngredID, row.ingredientName ?? '',
             row.ingredientID ?? '', quantity, row.unitName ?? '', row.unitID ?? '', row.displayText, row.linkedRecipeID ?? ''));
     });
-    setRecipeContent(recipe.description, recipe.process, ingredients);
+    setRecipeContent(recipe.description, recipe.process, recipe.notes, ingredients);
 }
 
 // Marks the creator as editing the given recipe

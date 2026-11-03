@@ -1,5 +1,5 @@
-// Sets up the Tiptap editors for the recipe description and process.
-// Loaded as a module; exposes descriptionEditor, processEditor, insertIngredient(), updateIngredient() and setRecipeContent() on window
+// Sets up the Tiptap editors for the recipe description, process and notes.
+// Loaded as a module; exposes descriptionEditor, processEditor, notesEditor, insertIngredient(), updateIngredient() and setRecipeContent() on window
 // so the classic scripts (createRecipe.js, recipeData.js) can use them.
 import { Editor, Node, Extension, mergeAttributes, Document, Paragraph, Text, Heading, UndoRedo,
          BulletList, OrderedList, ListItem,
@@ -99,6 +99,13 @@ const baseExtensions = [
     UndoRedo,
 ];
 
+// Flat bullet and numbered lists, for the process and notes editors
+const listExtensions = [
+    BulletList.configure({ HTMLAttributes: { class: 'recipe-list' } }),  // Started by typing "- " or "* "
+    OrderedList.configure({ HTMLAttributes: { class: 'recipe-list' } }), // Started by typing "1. "
+    FlatListItem,
+];
+
 // Creates an editor inside the given container; clicking empty space in the container focuses the end
 function createEditor(container, extensions) {
     const editor = new Editor({ element: container, extensions });
@@ -115,12 +122,13 @@ window.descriptionEditor = createEditor(document.getElementById('recipe-descript
 window.processEditor = createEditor(document.getElementById('recipe-process'), [
     ...baseExtensions,
     Heading.configure({ levels: [1], HTMLAttributes: { class: 'recipe-paragraph section-header' } }), // Toggled with "#"
-    BulletList.configure({ HTMLAttributes: { class: 'recipe-list' } }),  // Started by typing "- " or "* "
-    OrderedList.configure({ HTMLAttributes: { class: 'recipe-list' } }), // Started by typing "1. "
-    FlatListItem,
+    ...listExtensions,
     IngredientNode,
     ProcessShortcuts,
 ]);
+
+// Notes take paragraphs and lists, but no section headers or ingredients
+window.notesEditor = createEditor(document.getElementById('recipe-notes'), [...baseExtensions, ...listExtensions]);
 
 // Ingredient node attributes for an Ingredient (from recipeData.js); missing fields become ""
 function ingredientAttrs(ingredient) {
@@ -158,9 +166,9 @@ window.updateIngredient = function (ingredient) {
     processEditor.view.dispatch(tr);
 };
 
-// Loads a saved description and process (as returned by get_recipe.php) into the editors, without an undo step,
+// Loads a saved description, process and notes (as returned by get_recipe.php) into the editors, without an undo step,
 // so undo can't clear the loaded recipe. ingredients maps frontend IDs to Ingredient objects (recipeData.js)
-window.setRecipeContent = function (description, process, ingredients) {
+window.setRecipeContent = function (description, process, notes, ingredients) {
     const textContent = text => text ? [{ type: 'text', text }] : [];
     const doc = blocks => ({ type: 'doc', content: blocks.length ? blocks : [{ type: 'paragraph' }] });
 
@@ -173,6 +181,13 @@ window.setRecipeContent = function (description, process, ingredients) {
             : { type: 'text', text: segment.text }),
     });
 
+    // A flat list of paragraphs
+    const list = block => ({
+        type: block.ordered ? 'orderedList' : 'bulletList',
+        attrs: block.ordered ? { start: block.start ?? 1 } : {},
+        content: block.items.map(item => ({ type: 'listItem', content: [paragraph(item)] })),
+    });
+
     const descriptionBlocks = (description || []).map(text => ({ type: 'paragraph', content: textContent(text) }));
 
     const processBlocks = (process || []).map(block => {
@@ -180,15 +195,14 @@ window.setRecipeContent = function (description, process, ingredients) {
             return { type: 'heading', attrs: { level: 1 }, content: textContent(block.text) };
         }
         if (block.type === 'list') {
-            return {
-                type: block.ordered ? 'orderedList' : 'bulletList',
-                attrs: block.ordered ? { start: block.start ?? 1 } : {},
-                content: block.items.map(item => ({ type: 'listItem', content: [paragraph(item)] })),
-            };
+            return list(block);
         }
         return paragraph(block.content);
     });
 
+    const notesBlocks = (notes || []).map(block => block.type === 'list' ? list(block) : paragraph(block.content));
+
     descriptionEditor.chain().setMeta('addToHistory', false).setContent(doc(descriptionBlocks)).run();
     processEditor.chain().setMeta('addToHistory', false).setContent(doc(processBlocks)).run();
+    notesEditor.chain().setMeta('addToHistory', false).setContent(doc(notesBlocks)).run();
 };
